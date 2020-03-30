@@ -137,7 +137,43 @@ extern int yydebug;
     TOK_TRUE = 262,
     TOK_FALSE = 263,
     TOK_IDENT = 264,
-    TOK_STRING = 265
+    TOK_IF = 265,
+    TOK_ELSE = 266,
+    TOK_WHILE = 267,
+    TOK_FOR = 268,
+    TOK_PRINT = 269,
+    TOK_AFFECT = 270,
+    TOK_GE = 271,
+    TOK_LE = 272,
+    TOK_GT = 273,
+    TOK_LT = 274,
+    TOK_EQ = 275,
+    TOK_NE = 276,
+    TOK_PLUS = 277,
+    TOK_MINUS = 278,
+    TOK_MUL = 279,
+    TOK_DIV = 280,
+    TOK_MOD = 281,
+    TOK_UMINUS = 282,
+    TOK_SEMICOL = 283,
+    TOK_COMMA = 284,
+    TOK_LPAR = 285,
+    TOK_RPAR = 286,
+    TOK_LACC = 287,
+    TOK_RACC = 288,
+    TOK_STRING = 289,
+    TOK_DO = 290,
+    TOK_THEN = 291,
+    TOK_OR = 292,
+    TOK_AND = 293,
+    TOK_BOR = 294,
+    TOK_BXOR = 295,
+    TOK_BAND = 296,
+    TOK_SRL = 297,
+    TOK_SRA = 298,
+    TOK_SLL = 299,
+    TOK_NOT = 300,
+    TOKBNOT = 301
   };
 #endif
 /* Tokens.  */
@@ -148,7 +184,43 @@ extern int yydebug;
 #define TOK_TRUE 262
 #define TOK_FALSE 263
 #define TOK_IDENT 264
-#define TOK_STRING 265
+#define TOK_IF 265
+#define TOK_ELSE 266
+#define TOK_WHILE 267
+#define TOK_FOR 268
+#define TOK_PRINT 269
+#define TOK_AFFECT 270
+#define TOK_GE 271
+#define TOK_LE 272
+#define TOK_GT 273
+#define TOK_LT 274
+#define TOK_EQ 275
+#define TOK_NE 276
+#define TOK_PLUS 277
+#define TOK_MINUS 278
+#define TOK_MUL 279
+#define TOK_DIV 280
+#define TOK_MOD 281
+#define TOK_UMINUS 282
+#define TOK_SEMICOL 283
+#define TOK_COMMA 284
+#define TOK_LPAR 285
+#define TOK_RPAR 286
+#define TOK_LACC 287
+#define TOK_RACC 288
+#define TOK_STRING 289
+#define TOK_DO 290
+#define TOK_THEN 291
+#define TOK_OR 292
+#define TOK_AND 293
+#define TOK_BOR 294
+#define TOK_BXOR 295
+#define TOK_BAND 296
+#define TOK_SRL 297
+#define TOK_SRA 298
+#define TOK_SLL 299
+#define TOK_NOT 300
+#define TOKBNOT 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -161,7 +233,7 @@ union YYSTYPE
     char * strval;
     node_t ptr;
 
-#line 165 "y.tab.c" /* yacc.c:355  */
+#line 237 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -178,7 +250,7 @@ int yyparse (node_t * program_root);
 
 /* Copy the second part of user declarations.  */
 
-#line 182 "y.tab.c" /* yacc.c:358  */
+#line 254 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -423,7 +495,7 @@ union yyalloc
 #define YYLAST   1
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
+#define YYNTOKENS  47
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
@@ -434,7 +506,7 @@ union yyalloc
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   265
+#define YYMAXUTOK   301
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -469,14 +541,18 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    62,    70,    74
+       0,    80,    80,    85,    93,    97
 };
 #endif
 
@@ -486,8 +562,14 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "TOK_VOID", "TOK_INT", "TOK_INTVAL",
-  "TOK_BOOL", "TOK_TRUE", "TOK_FALSE", "TOK_IDENT", "TOK_STRING",
-  "$accept", "program", "listdeclnonnull", "maindecl", YY_NULLPTR
+  "TOK_BOOL", "TOK_TRUE", "TOK_FALSE", "TOK_IDENT", "TOK_IF", "TOK_ELSE",
+  "TOK_WHILE", "TOK_FOR", "TOK_PRINT", "TOK_AFFECT", "TOK_GE", "TOK_LE",
+  "TOK_GT", "TOK_LT", "TOK_EQ", "TOK_NE", "TOK_PLUS", "TOK_MINUS",
+  "TOK_MUL", "TOK_DIV", "TOK_MOD", "TOK_UMINUS", "TOK_SEMICOL",
+  "TOK_COMMA", "TOK_LPAR", "TOK_RPAR", "TOK_LACC", "TOK_RACC",
+  "TOK_STRING", "TOK_DO", "TOK_THEN", "TOK_OR", "TOK_AND", "TOK_BOR",
+  "TOK_BXOR", "TOK_BAND", "TOK_SRL", "TOK_SRA", "TOK_SLL", "TOK_NOT",
+  "TOKBNOT", "$accept", "program", "listdeclnonnull", "maindecl", YY_NULLPTR
 };
 #endif
 
@@ -497,7 +579,10 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295,   296,   297,   298,   299,   300,   301
 };
 # endif
 
@@ -555,13 +640,13 @@ static const yytype_uint8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    12,    13,    14,     0,    14
+       0,    48,    49,    50,     0,    50
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    11,    12,    12,    13,    14
+       0,    47,    48,    48,    49,    50
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1246,37 +1331,37 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 58 "grammar.y" /* yacc.c:1646  */
+#line 81 "grammar.y" /* yacc.c:1646  */
     {
             (yyval.ptr) = make_node(NODE_PROGRAM, 2, (yyvsp[-1].ptr), (yyvsp[0].ptr));
             *program_root = (yyval.ptr);
         }
-#line 1255 "y.tab.c" /* yacc.c:1646  */
+#line 1340 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 63 "grammar.y" /* yacc.c:1646  */
+#line 86 "grammar.y" /* yacc.c:1646  */
     {
             (yyval.ptr) = make_node(NODE_PROGRAM, 2, NULL, (yyvsp[0].ptr));
             *program_root = (yyval.ptr);
         }
-#line 1264 "y.tab.c" /* yacc.c:1646  */
+#line 1349 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 70 "grammar.y" /* yacc.c:1646  */
+#line 93 "grammar.y" /* yacc.c:1646  */
     { (yyval.ptr) = NULL; }
-#line 1270 "y.tab.c" /* yacc.c:1646  */
+#line 1355 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 74 "grammar.y" /* yacc.c:1646  */
+#line 97 "grammar.y" /* yacc.c:1646  */
     { (yyval.ptr) = NULL; }
-#line 1276 "y.tab.c" /* yacc.c:1646  */
+#line 1361 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1280 "y.tab.c" /* yacc.c:1646  */
+#line 1365 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1504,7 +1589,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 78 "grammar.y" /* yacc.c:1906  */
+#line 101 "grammar.y" /* yacc.c:1906  */
 
 
 /* A completer et/ou remplacer avec d'autres fonctions */

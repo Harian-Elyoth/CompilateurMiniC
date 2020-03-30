@@ -32,17 +32,76 @@ extern int yydebug;
 
 LETTRE          [a-zA-Z]
 /* A completer ; fausses definitions pour que lex ne fasse pas d'erreur */
-SPECHAR         [ -/]
+SPECHAR         [ -/] 
+/*Possible source d'erreur*/
 CHIFFRE         [0-9]
+CHIFFRE_NON_NUL [1-9]
+ENTIER_DEC      (0|{CHIFFRE_NON_NUL}){CHIFFRE}*
+LETTER_HEXA     [a-fA-Z]
+ENTIER_HEX      0x({CHIFFRE}|{LETTER_HEXA})+
 IDF             {LETTRE}({LETTRE}|{CHIFFRE}|_)*
-ENTIER          {CHIFFRE}+
-CHAINE          "({LETTRE}|{CHIFFRE}|{SPECHAR})*"
-COMMENTAIRE     //{CHAINE}
+ENTIER          {ENTIER_DEC}|{ENTIER_HEX}
+CHAINE_CAR      ([^"/])
+CHAINE          "({CHAINE_CAR}|\"|\n)*"
+COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 
 %%
 
 "void"          return TOK_VOID;
 
+"int"           return TOK_INT;
+
+"bool"          return TOK_BOOL;
+
+"true"          return TOK_TRUE;
+
+"false"         return TOK_FALSE;
+
+"if"            return TOK_IF;
+
+"else"          return TOK_ELSE;
+
+"while"         return TOK_WHILE;
+
+"for"           return TOK_FOR;
+
+"print"         return TOK_PRINT;
+
+"do"            return TOK_DO;
+
+";"             return TOK_SEMICOL;
+
+","             return TOK_COMMA;
+
+"-"             return TOK_MINUS;
+
+">="            return TOK_GE;
+
+"<="            return TOK_LE;
+
+">"             return TOK_GT;
+
+"<"             return TOK_LT;
+
+"=="            return TOK_EQ;
+
+"!="            return TOK_NE;
+
+"+"             return TOK_PLUS;
+
+"*"             return TOK_MUL;
+
+"/"             return TOK_DIV;
+
+"%"             return TOK_MOD;
+
+"("             return TOK_LPAR;
+
+")"             return TOK_RPAR;
+
+"{"             return TOK_LACC;
+
+"}"             return TOK_RACC;
 
 
 
@@ -54,7 +113,7 @@ COMMENTAIRE     //{CHAINE}
 }
 
 {ENTIER} {
-                /*yylval.intval = //CAST yytext en entier et */               
+                /*yylval.intval = CAST yytext en entier*/             
                 return TOK_INTVAL;
 }
 
