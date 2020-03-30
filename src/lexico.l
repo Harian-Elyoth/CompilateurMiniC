@@ -103,6 +103,26 @@ COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 
 "}"             return TOK_RACC;
 
+"||"            return TOK_OR;
+
+"&&"            return TOK_AND;
+
+"!"             return TOK_NOT;
+
+"|"             return TOK_BOR;
+
+"&"             return TOK_BAND;
+
+"~"             return TOK_BNOT;
+
+"^"             return TOK_BXOR;
+
+"<<"            return TOK_SLL;
+
+">>"            return TOK_SLR;
+
+">>>"           return TOK_SRA;
+
 
 
 
