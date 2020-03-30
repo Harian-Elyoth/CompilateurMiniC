@@ -54,7 +54,7 @@ COMMENTAIRE     //{CHAINE}
 }
 
 {ENTIER} {
-                yylval.intval = /*CAST yytext en entier et /*               
+                /*yylval.intval = //CAST yytext en entier et */               
                 return TOK_INTVAL;
 }
 
