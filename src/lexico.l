@@ -32,11 +32,12 @@ extern int yydebug;
 
 LETTRE          [a-zA-Z]
 /* A completer ; fausses definitions pour que lex ne fasse pas d'erreur */
+SPECHAR         [ -/]
 CHIFFRE         [0-9]
-IDF             A
-ENTIER          A
-CHAINE          A
-COMMENTAIRE     A
+IDF             {LETTRE}({LETTRE}|{CHIFFRE}|_)*
+ENTIER          {CHIFFRE}+
+CHAINE          "({LETTRE}|{CHIFFRE}|{SPECHAR})*"
+COMMENTAIRE     //{CHAINE}
 
 %%
 
@@ -53,12 +54,12 @@ COMMENTAIRE     A
 }
 
 {ENTIER} {
-                /* A completer : affecter yylval.intval et faire des verifications */                
+                yylval.intval = /*CAST yytext en entier et /*               
                 return TOK_INTVAL;
 }
 
 {CHAINE} {
-                /* A completer : affecter yylval.strval */
+                yylval.strval = strdup(yytext);
                 return TOK_STRING;
 }
 
