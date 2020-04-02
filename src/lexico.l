@@ -49,7 +49,11 @@ COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 
 "void"          return TOK_VOID;
 
-"int"           return TOK_INT;
+"int" {
+    printf("INT\n");
+    return TOK_INT;
+}
+
 
 "bool"          return TOK_BOOL;
 
@@ -119,21 +123,19 @@ COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 
 "<<"            return TOK_SLL;
 
-">>"            return TOK_SLR;
+">>"            return TOK_SRL;
 
 ">>>"           return TOK_SRA;
 
 
-
-
-
 {IDF} {
                 yylval.strval = strdup(yytext);
+                printf("IDF = %s,  yylval.strval");
                 return TOK_IDENT;
 }
 
 {ENTIER} {
-                /*yylval.intval = CAST yytext en entier*/             
+                yylval.intval = atoi(yytext);            
                 return TOK_INTVAL;
 }
 

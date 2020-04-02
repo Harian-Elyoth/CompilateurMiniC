@@ -173,7 +173,7 @@ extern int yydebug;
     TOK_SRA = 298,
     TOK_SLL = 299,
     TOK_NOT = 300,
-    TOKBNOT = 301
+    TOK_BNOT = 301
   };
 #endif
 /* Tokens.  */
@@ -220,7 +220,7 @@ extern int yydebug;
 #define TOK_SRA 298
 #define TOK_SLL 299
 #define TOK_NOT 300
-#define TOKBNOT 301
+#define TOK_BNOT 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -569,7 +569,7 @@ static const char *const yytname[] =
   "TOK_COMMA", "TOK_LPAR", "TOK_RPAR", "TOK_LACC", "TOK_RACC",
   "TOK_STRING", "TOK_DO", "TOK_THEN", "TOK_OR", "TOK_AND", "TOK_BOR",
   "TOK_BXOR", "TOK_BAND", "TOK_SRL", "TOK_SRA", "TOK_SLL", "TOK_NOT",
-  "TOKBNOT", "$accept", "program", "listdeclnonnull", "maindecl", YY_NULLPTR
+  "TOK_BNOT", "$accept", "program", "listdeclnonnull", "maindecl", YY_NULLPTR
 };
 #endif
 

@@ -88,7 +88,7 @@ extern int yydebug;
     TOK_SRA = 298,
     TOK_SLL = 299,
     TOK_NOT = 300,
-    TOKBNOT = 301
+    TOK_BNOT = 301
   };
 #endif
 /* Tokens.  */
@@ -135,7 +135,7 @@ extern int yydebug;
 #define TOK_SRA 298
 #define TOK_SLL 299
 #define TOK_NOT 300
-#define TOKBNOT 301
+#define TOK_BNOT 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

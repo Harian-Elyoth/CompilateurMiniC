@@ -65,7 +65,7 @@ node_t make_node(node_nature nature, int nops, ...);
 %left TOK_PLUS TOK_MINUS
 %left TOK_MUL TOK_DIV TOK_MOD
 
-%left TOK_UMINUS TOK_NOT TOKBNOT
+%left TOK_UMINUS TOK_NOT TOK_BNOT
 
 
 %type <intval> TOK_INTVAL
@@ -89,9 +89,70 @@ program:
         }
         ;
 
-listdeclnonnull:
-            { $$ = NULL; }
+listdecl:
+        listdeclnonnull
+        {
+
+        }
         ;
+
+listdeclnonnull:
+        vardecl 
+        {   
+            $$ = make_node(NODE_LIST,2);
+            *program_root = $$; 
+        }
+        | listdeclnonnull vardecl
+        {
+
+        }
+        ;
+
+vardecl: 
+        type listtypedecl TOK_SEMICOL
+        {
+            $$ = make_node(NODE_DECLS,1)
+        }
+        ;
+
+type:
+        TOK_INT
+        {
+            //return TOK_INT;
+            //Pas sur ..
+        }
+        | TOK_BOOL
+        {
+
+        }
+        | TOK_VOID
+        {
+
+        }
+        ;
+
+listtypedecl:
+        decl
+        {
+
+        }
+        |listtypedecl TOK_COMMA decl
+        {
+
+        }
+        ;
+
+decl:   
+        ident
+        {
+
+        }
+        | ident TOK_AFFECT expr
+        {
+
+        }
+        ;
+
 
 maindecl:
             { $$ = NULL; }
