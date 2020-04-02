@@ -79,12 +79,12 @@ node_t make_node(node_nature nature, int nops, ...);
 program:
         listdeclnonnull maindecl
         {
-            $$ = make_node(NODE_PROGRAM, 2, $1, $2);
+            $$ = make_node(NODE_PROGRAM, 2, $1, $2, NULL);
             *program_root = $$;
         }
         | maindecl
         {
-            $$ = make_node(NODE_PROGRAM, 2, NULL, $1);
+            $$ = make_node(NODE_PROGRAM, 1, NULL, $1);
             *program_root = $$;
         }
         ;
@@ -92,7 +92,7 @@ program:
 listdecl:
         listdeclnonnull
         {
-
+            
         }
         ;
 
@@ -145,7 +145,8 @@ listtypedecl:
 decl:   
         ident
         {
-
+            $$ = make_node(NODE_DECL, 0);
+            *program_root = $$;
         }
         | ident TOK_AFFECT expr
         {
@@ -163,9 +164,30 @@ maindecl:
 
 /* A completer et/ou remplacer avec d'autres fonctions */
 node_t make_node(node_nature nature, int nops, ...) {
-    va_list ap;
 
-    return NULL;
+    va_list ap;
+    node_t res;
+
+    if(nops < 1)
+    {
+        return NULL;
+    }
+
+    res->nature = nature;
+
+    va_start(ap,nops)
+    for(int i = 0; i < nops; i++)
+    {
+        total += va_arg(ap,int);
+    }
+
+    switch(nature)
+    {
+        case: NODE_IDENT
+            res->ident = 
+    }
+    va_end(ap);
+    return res;
 }
 
 
