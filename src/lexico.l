@@ -130,7 +130,6 @@ COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 
 {IDF} {
                 yylval.strval = strdup(yytext);
-                printf("IDF = %s,  yylval.strval");
                 return TOK_IDENT;
 }
 

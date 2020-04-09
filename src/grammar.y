@@ -99,19 +99,21 @@ listdecl:
 listdeclnonnull:
         vardecl 
         {   
-            $$ = make_node(NODE_LIST,2);
+            $$ = make_node(NODE_LIST, 1, $1);
             *program_root = $$; 
         }
         | listdeclnonnull vardecl
         {
-
+            $$ = make_node(NODE_LIST, 2, $1, $2, NULL);
+            *program_root = $$;
+            
         }
         ;
 
 vardecl: 
         type listtypedecl TOK_SEMICOL
         {
-            $$ = make_node(NODE_DECLS,1)
+            $$ = make_node(NODE_DECLS,1);
         }
         ;
 
@@ -156,38 +158,314 @@ decl:
 
 
 maindecl:
-            { $$ = NULL; }
+        type ident TOK_LPAR TOK_RPAR block
+        {
+
+        }
         ;
 
+listinst:
+        listinstnonnull
+        {
+
+        }
+        ;
+    
+listinstnonnull:
+        inst
+        {
+
+        }
+        |
+        listinstnonnull inst
+        {
+
+        }
+        ;
+
+inst:
+        expr TOK_SEMICOL
+        {
+
+        }
+        | 
+        TOK_IF TOK_LPAR expr TOK_RPAR inst TOK_ELSE inst
+        {
+
+        }
+        |
+        TOK_IF TOK_LPAR expr TOK_RPAR inst %prec TOK_THEN
+        {
+
+        }
+        |
+        TOK_WHILE TOK_LPAR expr TOK_RPAR inst
+        {
+
+        }
+        |
+        TOK_FOR TOK_LPAR expr TOK_SEMICOL expr TOK_SEMICOL expr TOK_RPAR inst
+        {
+
+        }
+        |
+        TOK_DO inst TOK_WHILE TOK_LPAR expr TOK_RPAR TOK_SEMICOL
+        {
+
+        }
+        |
+        block
+        {
+
+        }
+        |
+        TOK_SEMICOL
+        {
+
+        }
+        |
+        TOK_PRINT TOK_LPAR listparamprint TOK_RPAR TOK_SEMICOL
+        {
+
+        }
+        ;
+
+block:
+        
+        TOK_LACC listdecl listinst TOK_RACC
+        {
+
+        }
+        ;
+
+expr:
+
+        expr TOK_MUL expr
+        {
+
+        }
+        | expr TOK_DIV expr
+        {
+
+        }
+        |
+        expr TOK_PLUS expr
+        {
+
+        }
+        |
+        expr TOK_MINUS expr
+        {
+
+        }
+        |
+        expr TOK_MOD expr
+        {
+
+        }
+        | 
+        expr TOK_LT expr
+        {
+
+        }
+        | 
+        expr TOK_GT expr
+        {
+
+        }
+        | 
+        TOK_MINUS expr %prec TOK_UMINUS
+        {
+
+        }
+        | 
+        expr TOK_GE expr
+        {
+
+        }
+        |
+        expr TOK_LE expr
+        {
+
+        }
+        | 
+        expr TOK_EQ expr
+        {
+
+        }
+        | 
+        expr TOK_NE expr
+        {
+
+        }
+        | 
+        expr TOK_AND expr
+        {
+
+        }
+        | 
+        expr TOK_OR expr
+        {
+
+        }
+        | 
+        expr TOK_BAND expr
+        {
+
+        }
+        | 
+        expr TOK_BOR expr
+        {
+
+        }
+        | 
+        expr TOK_BXOR expr
+        {
+
+        }
+        | 
+        expr TOK_SRL expr
+        {
+
+        }
+        | 
+        expr TOK_SRA expr
+        {
+
+        }
+        | 
+        expr TOK_SLL expr
+        {
+
+        }
+        | 
+        TOK_NOT expr
+        {
+
+        }
+        | 
+        TOK_BNOT expr
+        {
+
+        }
+        | 
+        TOK_LPAR expr TOK_RPAR
+        {
+
+        }
+        | 
+        ident TOK_AFFECT expr
+        {
+
+        }
+        | 
+        TOK_INTVAL
+        {
+
+        }
+        | 
+        TOK_TRUE
+        {
+
+        }
+        | 
+        TOK_FALSE
+        {
+
+        }
+        | 
+        ident
+        {
+
+        }
+        ;
+
+listparamprint: 
+        listparamprint TOK_COMMA paramprint
+        {
+
+        }
+        |
+        paramprint
+        {
+
+        }
+        ;
+
+paramprint:
+        ident
+        {
+
+        }
+        |
+        TOK_STRING
+        {
+
+        }
+        ;
+
+ident:
+        TOK_IDENT
+        {
+
+        }
+        ;
 
 %%
 
 /* A completer et/ou remplacer avec d'autres fonctions */
 node_t make_node(node_nature nature, int nops, ...) {
 
+
+    
+
+    /*
+
+
+
+    make_node(node_nature nature, int nops, $1, $2, ..., NULL)
+    FEUILLE DE L'ARBRE
+    NODE_TYPE
+        make_node(nature, nops, type)
+    NODE_IDENT | INTVAL | STRVAL | BOOLVAL
+        make_node(nature, nops)
+    
+    NOEUDS DE L'ARBRE
+        make_node(nature, nops, $1, $2, ...)
+
+    node_t res
+
+    res.lineno = yylineno
+    initialisation pour toutes les natures de nodes
+    opr lineno ops
+
+    switch(nature){
+        case NODE_TYPE:
+            res.type = va_arg(ap, node_type)
+    }
+    */
     va_list ap;
-    node_t res;
+    /*node_t res;
 
     if(nops < 1)
     {
         return NULL;
     }
 
-    res->nature = nature;
+    res.nature = nature;
 
     va_start(ap,nops)
-    for(int i = 0; i < nops; i++)
-    {
-        total += va_arg(ap,int);
-    }
+    
+    
 
     switch(nature)
     {
         case: NODE_IDENT
-            res->ident = 
+            res.ident = strval
     }
     va_end(ap);
-    return res;
+    return res;*/
+    return NULL;
 }
 
 

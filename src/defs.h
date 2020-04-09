@@ -75,22 +75,22 @@ typedef enum node_type_s {
 
 
 typedef struct _node_s {
-    node_nature nature;
-    node_type type;
+    node_nature nature; 
+    node_type type; //TYPE_NONE if nature != NODE_TYPE
 
-    int64_t value;
-    int32_t offset;
-    bool global_decl;
+    int64_t value; //NODE_INTVAL | NODE_BOOLVAL
+    int32_t offset; //Passe 1
+    bool global_decl; //Passe 1
     int32_t lineno;
-    int32_t stack_size;
+    int32_t stack_size; //Passe 1
 
-    int32_t nops;
+    int32_t nops; 
     struct _node_s ** opr;
     
     struct _node_s * decl_node;
 
-    char * ident;
-    char * str;
+    char * ident; //NODE_IDENT
+    char * str; //NODE_STRINGVAL
 
     // Pour l'afichage du graphe
     int32_t node_num;
