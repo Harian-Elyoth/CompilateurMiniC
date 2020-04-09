@@ -445,6 +445,55 @@ node_t make_node(node_nature nature, int nops, ...) {
     }
     */
     va_list ap;
+    node_t res = malloc(sizeof(node_s));
+    if(res == NULL){
+        printf("ERREUR D'ALLOCATION MEMOIRE DANS LE MAKENODE");
+        return 0;
+    }
+    else {
+        if(nops < 1){
+
+            printf("ERREUR DE NOPS DANS LE MAKENODE");
+
+            return NULL;
+        }
+
+        res->nature = nature;
+        res->lineno = yylineno;
+        res->nops = nops;
+        va_start(ap, nops);
+        switch(nature){
+            case NODE_TYPE :
+                res->type = va_arg(ap, node_type);
+                break;
+
+            case NODE_INDENT :
+                res->type = TYPE_NONE;
+                res->ident = ident; 
+                break;
+            
+            case NODE_INTVAL :
+                res->type = TYPE_NONE;
+                res->value = intval;
+                break;
+            
+            case NODE_STRINGVAL :
+                res->type = TYPE_NONE;
+                res->str = strval;
+                break;
+
+            case NODE_BOOLVAL :
+                res->type = TYPE_NONE;
+                res->value = intval;
+                break;
+
+            default :
+                res->type = TYPE_NONE;
+                for(int i = 0 ; i < nops ; i++){
+                    res->opr[i] = va_arg(ap, node_s);
+                }
+        }
+    }
     /*node_t res;
 
     if(nops < 1)

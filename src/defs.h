@@ -70,7 +70,7 @@ typedef enum node_type_s {
     TYPE_INT,
     TYPE_BOOL,
     TYPE_STRING,
-    TYPE_VOID,
+    TYPE_VOID,  
 } node_type;
 
 
