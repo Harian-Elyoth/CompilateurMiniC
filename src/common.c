@@ -18,8 +18,9 @@ extern char * outfile;
 
 
 void parse_args(int argc, char ** argv) {
-    /* A corriger et completer */
+    
     infile = argv[1];
+    
 }
 
 

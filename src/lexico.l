@@ -163,7 +163,10 @@ int yywrap(void) {
 
 
 int main(int argc, char ** argv) {
-    /* A completer */
+    if(argc < 2){
+        printf("Vous n'avez pas joints de fichier à compiler !\n");
+        return 0;
+    }
     node_t program_root;
     parse_args(argc, argv);
     #if YYDEBUG
