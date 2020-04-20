@@ -44,18 +44,21 @@ ENTIER          {ENTIER_DEC}|{ENTIER_HEX}
 CHAINE_CAR      ([^"/])
 CHAINE          "({CHAINE_CAR}|\"|\n)*"
 COMMENTAIRE     \2F\2F{CHAINE_CAR}*
+SPACE           [ \t]+
+SAUTDELIGNE     \r\n
+
 
 %%
 
 "void"          return TOK_VOID;
 
-"int" {
-    printf("INT\n");
-    return TOK_INT;
-}
+"int"           return TOK_INT;
+
 
 
 "bool"          return TOK_BOOL;
+
+"="             return TOK_AFFECT;
 
 "true"          return TOK_TRUE;
 
@@ -147,7 +150,15 @@ COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 }
 
 
-[ \t\n]+
+
+{SAUTDELIGNE}|{SPACE} {
+
+}
+
+
+
+
+
 
 . {
                 fprintf(stderr, "Error line %d: Lexical error\n", yylineno);
@@ -163,12 +174,16 @@ int yywrap(void) {
 
 
 int main(int argc, char ** argv) {
+
+    
     if(argc < 2){
         printf("Vous n'avez pas joints de fichier à compiler !\n");
         return 0;
     }
+
     node_t program_root;
     parse_args(argc, argv);
+    
     #if YYDEBUG
     yydebug = 1;
     #endif

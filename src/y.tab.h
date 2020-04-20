@@ -34,7 +34,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -142,7 +142,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 36 "grammar.y" /* yacc.c:1909  */
+#line 37 "grammar.y" /* yacc.c:1909  */
 
     int32_t intval;
     char * strval;

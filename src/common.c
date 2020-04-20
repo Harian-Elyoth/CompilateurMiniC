@@ -18,9 +18,12 @@ extern char * outfile;
 
 
 void parse_args(int argc, char ** argv) {
-    
-    infile = argv[1];
-    
+        FILE *monfichier = fopen(argv[1], "r");
+        if(monfichier == NULL){
+            printf("Fichier introuvable ! \n");
+            return;
+        }
+        infile = argv[1];
 }
 
 

@@ -20,10 +20,10 @@ minicc: y.tab.o lex.yy.o common.o
 	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) y.tab.o lex.yy.o common.o -o $@ -lminiccutils
 
 y.tab.c: grammar.y Makefile
-	yacc -d grammar.y
+	yacc -d grammar.y --debug --verbose
 
 lex.yy.c: lexico.l Makefile
-	lex lexico.l
+	flex -d lexico.l  
 
 lex.yy.o: lex.yy.c
 	gcc $(DEBUG_FLAGS) $(CFLAGS) $(INCLUDE) -o $@ -c $<

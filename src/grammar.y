@@ -20,6 +20,7 @@ extern bool stop_after_verif;
 extern char * infile;
 extern char * outfile;
 
+
 /* prototypes */
 int yylex(void);
 extern int yylineno;
@@ -80,7 +81,8 @@ node_t make_node(node_nature nature, int nops, ...);
 program:
         listdeclnonnull maindecl
         {
-            $$ = make_node(NODE_PROGRAM, 2, $1, $2, NULL);
+            printf("regle : listdeclnonnull maindecl\n");
+            $$ = make_node(NODE_PROGRAM, 2, $1, $2);
             *program_root = $$;
         }
         | maindecl
@@ -106,7 +108,7 @@ program:
 listdecl:
         listdeclnonnull
         {
-            //$$ = make_node(NODE_LIST, 1, $1, NULL);
+            $$ = $1;
         }
         ;
 
@@ -170,7 +172,9 @@ decl:
         }
         | ident TOK_AFFECT expr
         {
+
             $$ = make_node(NODE_DECL, 2, $1, NULL, $3);
+
             *program_root = $$;
         }
         ;
@@ -209,7 +213,7 @@ listinstnonnull:
 inst:
         expr TOK_SEMICOL
         {
-
+            $$ = $1;
         }
         | 
         TOK_IF TOK_LPAR expr TOK_RPAR inst TOK_ELSE inst
@@ -244,12 +248,13 @@ inst:
         |
         block
         {
-            
+            $$ = $1;
         }
         |
         TOK_SEMICOL
         {
-            //Je ne sais pas
+            $$ = NULL;
+
         }
         |
         TOK_PRINT TOK_LPAR listparamprint TOK_RPAR TOK_SEMICOL
@@ -313,7 +318,7 @@ expr:
         | 
         TOK_MINUS expr %prec TOK_UMINUS
         {
-
+            $$ = $2;
         }
         | 
         expr TOK_GE expr
@@ -402,7 +407,7 @@ expr:
         | 
         TOK_LPAR expr TOK_RPAR
         {
-            //a voir
+            $$ = $2;
         }
         | 
         ident TOK_AFFECT expr
@@ -431,7 +436,7 @@ expr:
         | 
         ident
         {
-            
+           $$ = $1; 
         }
         ;
 
@@ -450,7 +455,7 @@ listparamprint:
 paramprint:
         ident
         {
-
+            $$ = $1;
         }
         |
         TOK_STRING
@@ -463,8 +468,7 @@ paramprint:
 ident:
         TOK_IDENT
         {
-            //$$ = make_node(NODE_IDENT, 1, ); 
-            /*il manque un parametre a make_node*/
+            $$ = make_node(NODE_IDENT, 1, yylval.strval); 
             *program_root = $$;
 
         }
@@ -500,51 +504,61 @@ node_t make_node(node_nature nature, int nops, ...) {
         return 0;
     }
     else {
+        
         if(nops < 1){
 
             printf("ERREUR DE NOPS DANS LE MAKENODE");
 
             return NULL;
         }
+    res->opr = malloc(sizeof(node_t)*nops);
+    
+    res->nature = nature;
+    res->lineno = yylineno;
+    res->nops = nops;
+    va_start(ap, nops);
+    switch(nature){
+        case NODE_TYPE :
+            res->type = va_arg(ap, node_type);
+            break;
 
-        res->nature = nature;
-        res->lineno = yylineno;
-        res->nops = nops;
-        va_start(ap, nops);
-        switch(nature){
-            case NODE_TYPE :
-                res->type = va_arg(ap, node_type);
-                break;
+        case NODE_IDENT :
 
-            case NODE_IDENT :
-                res->type = TYPE_NONE;
-                res->ident = va_arg(ap, char *); 
-                break;
-            
-            case NODE_INTVAL :
-                res->type = TYPE_NONE;
-                res->value = yylval.intval;
-                break;
-            
-            case NODE_STRINGVAL :
-                res->type = TYPE_NONE;
-                res->str = yylval.strval;
-                break;
+            printf("JE TENTE D'INSTANCIER RES->IDENT\n");
+            res->type = TYPE_NONE;
+            char * monstr = va_arg(ap, char *);
+            printf("\n\nMon str vaut %s\n\n", monstr);
+            res->ident = malloc(sizeof(char)*strlen(monstr));
+            res->ident = monstr;
+            break;
+        
+        case NODE_INTVAL :
+            res->type = TYPE_NONE;
+            res->value = yylval.intval;
+            break;
+        
+        case NODE_STRINGVAL :
+            res->type = TYPE_NONE;
+            res->str = yylval.strval;
+            break;
 
-            case NODE_BOOLVAL :
-                res->type = TYPE_NONE;
-                res->value = yylval.intval;
-                break;
+        case NODE_BOOLVAL :
+            res->type = TYPE_NONE;
+            res->value = yylval.intval;
+            break;
 
-            default :
-                res->type = TYPE_NONE;
-                for(int i = 0 ; i < nops ; i++){
+        default :
+            res->type = TYPE_NONE;
+            for(int i = 0 ; i < nops ; i++){
+                node_t arg_res = va_arg(ap, node_t);
+                if(arg_res != NULL)
                     res->opr[i] = va_arg(ap, node_t);
-                }
-                break;
-        }
-        va_end(ap);
+            }
+            break;
     }
+    va_end(ap);
+    return res;
+}
     /*node_t res;
 
     if(nops < 1)
@@ -565,7 +579,6 @@ node_t make_node(node_nature nature, int nops, ...) {
     }
     va_end(ap);
     return res;*/
-    return NULL;
 }
 
 
