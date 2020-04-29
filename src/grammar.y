@@ -87,7 +87,7 @@ program:
         }
         | maindecl
         {
-            $$ = make_node(NODE_PROGRAM, 1, NULL, $1);
+            $$ = make_node(NODE_PROGRAM, 2, NULL, $1);
             *program_root = $$;
             /*
                             make_node(node_nature nature, int nops, $1, $2, ..., NULL)
@@ -110,6 +110,7 @@ listdecl:
         {
             $$ = $1;
         }
+        |
         ;
 
 listdeclnonnull:
@@ -194,6 +195,7 @@ listinst:
             $$ = make_node(NODE_LIST, 1, $1);
             *program_root = $$;
         }
+        |
         ;
     
 listinstnonnull:
@@ -443,12 +445,13 @@ expr:
 listparamprint: 
         listparamprint TOK_COMMA paramprint
         {
-
+            $$ = make_node(NODE_LIST, 3, $1, NULL, $3);
+            *program_root = $$;
         }
         |
         paramprint
         {
-
+            $$ = $1;
         }
         ;
 
@@ -524,10 +527,8 @@ node_t make_node(node_nature nature, int nops, ...) {
 
         case NODE_IDENT :
 
-            printf("JE TENTE D'INSTANCIER RES->IDENT\n");
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
-            printf("\n\nMon str vaut %s\n\n", monstr);
             res->ident = malloc(sizeof(char)*strlen(monstr));
             res->ident = monstr;
             break;
@@ -552,7 +553,7 @@ node_t make_node(node_nature nature, int nops, ...) {
             for(int i = 0 ; i < nops ; i++){
                 node_t arg_res = va_arg(ap, node_t);
                 if(arg_res != NULL)
-                    res->opr[i] = va_arg(ap, node_t);
+                    res->opr[i] = arg_res;
             }
             break;
     }
