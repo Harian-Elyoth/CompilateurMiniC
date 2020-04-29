@@ -2454,12 +2454,15 @@ int main(int argc, char ** argv) {
     #endif
     
     yyin = fopen(infile, "r");
-    yyparse(&program_root);    
-    dump_tree(program_root, "monfichier.dot");
+    yyparse(&program_root);
+
+    
+    //dump_tree(program_root, "monfichier.dot");
+
+    printf("I finished parsing !\n\n");
 
     fclose(yyin);
 
-    printf("FIN DE LA PARSE DES TOKENS !!!! \n\n");
     //analyse_tree(program_root);
     yylex_destroy();
 

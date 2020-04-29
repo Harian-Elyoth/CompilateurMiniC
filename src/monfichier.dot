@@ -2,4 +2,13 @@ digraph global_vars {
     N1 [shape=record, label="{{NODE PROGRAM|Nb. ops: 2}}"];
     N2 [shape=record, label="{{NODE LIST}}"];
     N3 [shape=record, label="{{NODE LIST}}"];
-    N4 [shape=record, label="{{NODE DECLS|Nb. ops: 1}}"];
+    N4 [shape=record, label="{{NODE DECLS|Nb. ops: 3}}"];
+    N5 [shape=record, label="{{NODE TYPE|Type: TYPE INT}}"];
+    N6 [shape=record, label="{{NULL}}"];
+    edge[tailclip=true];
+    N5 -> N6
+    edge[tailclip=true];
+    N4 -> N5
+    N7 [shape=record, label="{{NODE LIST}}"];
+    N8 [shape=record, label="{{NODE DECL|Nb. ops: 2}}"];
+}
