@@ -133,7 +133,7 @@ listdeclnonnull:
 vardecl: 
         type listtypedecl TOK_SEMICOL
         {
-            $$ = make_node(NODE_DECLS,1);
+            $$ = make_node(NODE_DECLS, 2,  $1, $2);
         }
         ;
 
@@ -431,13 +431,13 @@ expr:
         | 
         TOK_TRUE
         {
-            $$ = make_node(NODE_BOOLVAL, 1);
+            $$ = make_node(NODE_BOOLVAL, 1, "true");
             
         }
         | 
         TOK_FALSE
         {
-            $$ = make_node(NODE_BOOLVAL, 1);
+            $$ = make_node(NODE_BOOLVAL, 1, "false");
             
         }
         | 
@@ -551,7 +551,10 @@ node_t make_node(node_nature nature, int nops, ...) {
 
         case NODE_BOOLVAL :
             res->type = TYPE_NONE;
-            res->value = yylval.intval;
+            if(va_arg(ap, char *) == "true")
+                res->value = 1;
+            else
+                res->value = 0;
             break;
 
         default :

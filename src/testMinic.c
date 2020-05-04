@@ -1,4 +1,5 @@
-int b = 5;
-void main(){
-    b = b + 5;
+int a = 1, b;
+bool c = true;
+void main()
+{
 }

@@ -146,11 +146,15 @@ static void dump_tree2dot(FILE * f, node_t root) {
 
 
 void dump_tree(node_t prog_root, const char * dotname) {
-
+    printf("\n\nDebut du Dump Tree\n\n");
     FILE * f;
-
     f = fopen(dotname, "w");
+    if(f == NULL){
+        printf("\n\nERREUR DANS L'OUVERTURE DU FICHIER !\n\n");
+    }
+    printf("Je commence a faire des trucs \n\n");
     fprintf(f, "digraph global_vars {\n");
+    printf("\n\n\n");
     dump_tree2dot(f, prog_root);
     fprintf(f, "}");    
     fclose(f);

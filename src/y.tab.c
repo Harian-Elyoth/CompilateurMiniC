@@ -1560,7 +1560,7 @@ yyreduce:
   case 8:
 #line 135 "grammar.y" /* yacc.c:1646  */
     {
-            (yyval.ptr) = make_node(NODE_DECLS,1);
+            (yyval.ptr) = make_node(NODE_DECLS, 2,  (yyvsp[-2].ptr), (yyvsp[-1].ptr));
         }
 #line 1566 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -1987,7 +1987,7 @@ yyreduce:
   case 56:
 #line 433 "grammar.y" /* yacc.c:1646  */
     {
-            (yyval.ptr) = make_node(NODE_BOOLVAL, 1);
+            (yyval.ptr) = make_node(NODE_BOOLVAL, 1, "true");
             
         }
 #line 1994 "y.tab.c" /* yacc.c:1646  */
@@ -1996,7 +1996,7 @@ yyreduce:
   case 57:
 #line 439 "grammar.y" /* yacc.c:1646  */
     {
-            (yyval.ptr) = make_node(NODE_BOOLVAL, 1);
+            (yyval.ptr) = make_node(NODE_BOOLVAL, 1, "false");
             
         }
 #line 2003 "y.tab.c" /* yacc.c:1646  */
@@ -2353,7 +2353,10 @@ node_t make_node(node_nature nature, int nops, ...) {
 
         case NODE_BOOLVAL :
             res->type = TYPE_NONE;
-            res->value = yylval.intval;
+            if(va_arg(ap, char *) == "true")
+                res->value = 1;
+            else
+                res->value = 0;
             break;
 
         default :
