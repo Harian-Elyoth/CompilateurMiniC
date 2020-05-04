@@ -34,16 +34,15 @@ LETTRE          [a-zA-Z]
 /* A completer ; fausses definitions pour que lex ne fasse pas d'erreur */
 SPECHAR         [ -/] 
 /*Possible source d'erreur*/
-GUILLEMET       ["]
 CHIFFRE         [0-9]
 CHIFFRE_NON_NUL [1-9]
 ENTIER_DEC      (0|{CHIFFRE_NON_NUL}){CHIFFRE}*
-LETTER_HEXA     [a-fA-F]
+LETTER_HEXA     [a-fA-Z]
 ENTIER_HEX      0x({CHIFFRE}|{LETTER_HEXA})+
 IDF             {LETTRE}({LETTRE}|{CHIFFRE}|_)*
 ENTIER          {ENTIER_DEC}|{ENTIER_HEX}
 CHAINE_CAR      ([^"/])
-CHAINE          {GUILLEMET}({CHAINE_CAR}|\"|\n)*{GUILLEMET}
+CHAINE          "({CHAINE_CAR}|\"|\n)*"
 COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 SPACE           [ \t]+
 SAUTDELIGNE     \r\n
@@ -191,17 +190,11 @@ int main(int argc, char ** argv) {
     
     yyin = fopen(infile, "r");
     yyparse(&program_root);
-
-    
-    //dump_tree(program_root, "monfichier.dot");
-
-    printf("I finished parsing !\n\n");
-
+    printf("\n Fin de la parse !\n");
+    dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
-
     //analyse_tree(program_root);
     yylex_destroy();
-
     return 0;
 }
 
