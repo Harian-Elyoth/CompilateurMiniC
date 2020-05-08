@@ -519,7 +519,6 @@ node_t make_node(node_nature nature, int nops, ...) {
 
         case NODE_IDENT :
 
-            printf("JE TENTE D'INSTANCIER RES->IDENT\n");
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
             printf("\n\nMon str vaut %s\n\n", monstr);
@@ -578,19 +577,7 @@ node_t make_node(node_nature nature, int nops, ...) {
 }
 
 
-void passe_1(node_t root){
 
-    switch(root->nature){
-        case NODE_PROGRAM :
-            push_global_context();
-            break;
-        case NODE_IDENT :
-        case NODE_TYPE :
-        case NODE_DECL
-        default :
-            break;
-    }
-}
 
 
 /* A completer */
