@@ -89,19 +89,7 @@ program:
         {
             $$ = make_node(NODE_PROGRAM, 1, NULL, $1);
             *program_root = $$;
-            /*
-                            make_node(node_nature nature, int nops, $1, $2, ..., NULL)
-                FEUILLE DE L'ARBRE
-                NODE_TYPE
-                    make_node(nature, nops, type)
-                NODE_IDENT | INTVAL | STRVAL | BOOLVAL
-                    make_node(nature, nops)
-                
-                NOEUDS DE L'ARBRE
-                    make_node(nature, nops, $1, $2, ...)
 
-            node_t res
-            */
         }
         ;
 
@@ -590,12 +578,25 @@ node_t make_node(node_nature nature, int nops, ...) {
 }
 
 
+void passe_1(node_t root){
+
+    switch(root->nature){
+        case NODE_PROGRAM :
+            push_global_context();
+            break;
+        case NODE_IDENT :
+        case NODE_TYPE :
+        case NODE_DECL
+        default :
+            break;
+    }
+}
+
 
 /* A completer */
 void analyse_tree(node_t root) {
     if (!stop_after_syntax) {
-        // Appeler la passe 1
-
+        passe_1(root);
         if (!stop_after_verif) {
             create_program(); 
             // Appeler la passe 2
