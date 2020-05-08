@@ -81,10 +81,7 @@ bool idf_in_context(context_t context, char * idf){
     return true;
 }
 
-
-
-
-
+bool context_add_element(context_t context, char * idf, void * data_argument){
 
 	if(idf_in_context(context, idf)){
 		return false;
