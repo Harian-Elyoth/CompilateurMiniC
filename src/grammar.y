@@ -501,7 +501,6 @@ node_t make_node(node_nature nature, int nops, ...) {
 
         case NODE_IDENT :
 
-            printf("JE TENTE D'INSTANCIER RES->IDENT\n");
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
             printf("\n\nMon str vaut %s\n\n", monstr);
@@ -536,8 +535,10 @@ node_t make_node(node_nature nature, int nops, ...) {
         }
     va_end(ap);
     return res;
+
     }
 }
+
 
 
 /* A completer */
