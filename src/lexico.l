@@ -190,7 +190,8 @@ int main(int argc, char ** argv) {
     
     yyin = fopen(infile, "r");
     yyparse(&program_root);
-    printf("\n Fin de la parse !\n");
+    printf("\nFin de la parse !\n");
+    create_context();
     dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
     //analyse_tree(program_root);
