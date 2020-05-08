@@ -474,24 +474,6 @@ ident:
 /* A completer et/ou remplacer avec d'autres fonctions */
 node_t make_node(node_nature nature, int nops, ...) {
 
-
-    
-
-    /*
-
-
-
-
-
-    res.lineno = yylineno
-    initialisation pour toutes les natures de nodes
-    opr lineno ops
-
-    switch(nature){
-        case NODE_TYPE:
-            res.type = va_arg(ap, node_type)
-    }
-    */
     va_list ap;
     node_t res = malloc(sizeof(node_s));
     if(res == NULL){
@@ -551,50 +533,15 @@ node_t make_node(node_nature nature, int nops, ...) {
                 res->opr[i] = va_arg(ap, node_t);
             }
             break;
-    }
+        }
     va_end(ap);
     return res;
-}
-    /*node_t res;
-
-    if(nops < 1)
-    {
-        return NULL;
-    }
-
-    res.nature = nature;
-
-    va_start(ap,nops)
-    
-    
-
-    switch(nature)
-    {
-        case: NODE_IDENT
-            res.ident = strval
-    }
-    va_end(ap);
-    return res;*/
-}
-
-
-void passe_1(node_t root){
-
-    switch(root->nature){
-        case NODE_PROGRAM :
-            push_global_context();
-            break;
-        case NODE_IDENT :
-        case NODE_TYPE :
-        case NODE_DECL
-        default :
-            break;
     }
 }
 
 
 /* A completer */
-void analyse_tree(node_t root) {
+/*void analyse_tree(node_t root) {
     if (!stop_after_syntax) {
         passe_1(root);
         if (!stop_after_verif) {
@@ -606,7 +553,7 @@ void analyse_tree(node_t root) {
         }
         free_global_strings();
     }
-}
+}*/
 
 
 
