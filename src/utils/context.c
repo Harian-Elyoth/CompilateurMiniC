@@ -17,6 +17,7 @@ context_t create_context()
 	context->root = malloc(sizeof(noeud_s));
 	noeud_t root = context->root;
 	root->idf_existant = true;
+	root->data = malloc(sizeof(int));
 	root->lettre = '/';
 	for(int i = 0 ; i < NB_ELEM_ALPHABET ; i++){
 		root->suite_idf[i] = malloc(sizeof(noeud_s));
@@ -28,8 +29,10 @@ context_t create_context()
 
 void * get_data(context_t context, char * idf)
 {
+	void * data = malloc(sizeof(int));
 	
-	if(!idf_in_context(context, idf)){
+	if(idf_in_context(context, idf) == false){
+		printf("%s n'existe pas dans ce context\n",idf);
 		return NULL;
 	}
 	else {
@@ -38,14 +41,27 @@ void * get_data(context_t context, char * idf)
 		char * char_actuel = idf;
 		int longueur_idf = strlen(idf);
 		for(int i = 0 ; i < longueur_idf ; i ++){
-			if(i == longueur_idf - 1){
-				return noeud_actuel->data;
+			if(i == longueur_idf){
+				data = noeud_actuel->data;
+				if (data == NULL)
+				{
+					printf("DATA NON ALLOUE, FOR\n");
+					printf("Le noeud actuel est la lettre : %c\n",noeud_actuel->lettre);
+				}
+				return data;
 			}
 			else
 			{
 				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
 			}
 		}
+		printf("on est la\n");
+		data = noeud_actuel->data;
+		if (data == NULL)
+				{
+					printf("DATA NON ALLOUE, END\n");
+				}
+		return data;
 	}
 }
 
@@ -60,24 +76,16 @@ bool idf_in_context(context_t context, char * idf){
     char * char_actuel = idf;
     int longueur_idf = strlen(idf);
     for(int i = 0 ; i < longueur_idf ; i++){
-
             //On pars du principe que l'allocation se fasse dans l'ordre
             //aka si on doit allouer un b on le fait a deuxieme case et non a la premiere.
-			
             if((noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A])->idf_existant){// Si la lettre existe
-				//On passe a la lettre suivante
-				
+				//On passe a la lettre suivante				
 				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
             }
             else {
-
-
                 return false;
             }
-
-    }
-
-
+	}
     return true;
 }
 
@@ -101,6 +109,9 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 			noeud_actuel->lettre = char_actuel[i];
 			noeud_actuel->idf_existant = true;
 			if(i == longueur_idf - 1){
+				printf("On alloue la data : %d pour Bonjour\n", *((int *)data_argument));
+				printf("Le noeud actuel est la lettre : %c\n",noeud_actuel->lettre);
+				noeud_actuel->data = malloc(sizeof(int));
 				noeud_actuel->data = (void *)data_argument;
 			}
 		}
