@@ -11,6 +11,9 @@
 #include "context.h"
 
 
+
+// Alloue un objet de type context_t et le retourne
+
 context_t create_context()
 {
 	context_t context = malloc(sizeof(context_t));
@@ -20,6 +23,9 @@ context_t create_context()
 	root->lettre = '/';
 	return context;
 }
+
+// Retourne le noeud précédemment associé à idf dans context, 
+// ou null si idf n’existe pas dans context.
 
 void * get_data(context_t context, char * idf)
 {
@@ -64,6 +70,8 @@ void * get_data(context_t context, char * idf)
 	}
 }
 
+// Libère la mémoire allouée pour context.
+
 void free_context(context_t context)
 {
 	printf("On rentre dans free_context\n");
@@ -75,6 +83,9 @@ void free_context(context_t context)
 
 //Fonction récursive
 //Free tout les noeuds herité de son parametre noeud
+//Ne fonctionne pas encore bien !
+//Ne free pas le champ data du noeud ..
+
 void free_noeud(noeud_t noeud)
 {
 	printf("lettre actuelle : %c\n", noeud->lettre);
@@ -88,14 +99,14 @@ void free_noeud(noeud_t noeud)
 	{
 		if (noeud->suite_idf[i] != NULL)
 		{
-			
 			free_noeud(noeud->suite_idf[i]);
-			//free(noeud->suite_idf[i]->data);
-			
 		}
 	}
 	free(noeud);
 }
+
+// Verifie si un idf est present dans un contexte
+// Renvoie true si l'idf existe et false sinon.
 
 bool idf_in_context(context_t context, char * idf){
 
@@ -103,8 +114,10 @@ bool idf_in_context(context_t context, char * idf){
     char * char_actuel = idf;
     int longueur_idf = strlen(idf);
     for(int i = 0 ; i < longueur_idf ; i++){
-            //On pars du principe que l'allocation se fasse dans l'ordre
-            //aka si on doit allouer un b on le fait a deuxieme case et non a la premiere.
+
+            // On pars du principe que l'allocation se fasse dans l'ordre
+            // si on doit allouer un b on le fait a deuxieme case et non a la premiere.
+
             if (noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] != NULL)
             {
             	if((noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A])->idf_existant)// Si la lettre existe
@@ -124,6 +137,11 @@ bool idf_in_context(context_t context, char * idf){
     return true;
 }
 
+
+// Ajoutel’association entre le nom idf et le noeud data dans le contexte context. 
+// Si le nom idf est déjà présent, l’ajout échoue et la fonction retourne false. 
+// Sinon, la fonction retourne true.
+
 bool context_add_element(context_t context, char * idf, void * data_argument){
 
 	if(idf_in_context(context, idf)){
@@ -133,10 +151,6 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 
 		noeud_t noeud_actuel = context->root;
 		char * char_actuel = idf;
-		//On passe directement a la premiere lettre de l'identifier
-		//noeud_actuel = noeud_actuel->suite_idf[char_actuel[0] - CODE_ASCII_A];
-		//noeud_actuel->lettre = char_actuel[0];
-		//noeud_actuel->idf_existant = true;
 		int longueur_idf = strlen(idf);
 
 		for(int i = 0 ; i < longueur_idf; i++){
@@ -145,10 +159,10 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 			noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
 			noeud_actuel->lettre = char_actuel[i];
 			noeud_actuel->idf_existant = true;
+
 			if(i == longueur_idf - 1){
 				noeud_actuel->data = malloc(sizeof(int));
 				noeud_actuel->data = (void *)data_argument;
-				printf("lettre actuelle : %c\n", noeud_actuel->lettre);
 			}
 		}
 	}

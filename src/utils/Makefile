@@ -3,13 +3,16 @@ CFLAGS = -Wall -Werror -std=c99
 
 all: test
 
-test: test_listechainee.o context.o
-	gcc $(CFLAGS) test_listechainee.o context.o -o $@ 
+test: test.o context.o env.o
+	gcc $(CFLAGS) test.o context.o env.o -o $@ 
 
-test_listechainee.o: test_listechainee.c 
+test.o: test.c 
 	gcc $(CFLAGS) -o $@ -c $<
 
 context.o: context.c context.h
+	gcc $(CFLAGS) -o $@ -c $<
+
+env.o: env.c env.h
 	gcc $(CFLAGS) -o $@ -c $<
 
 clean:

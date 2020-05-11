@@ -6,6 +6,8 @@
 int main(int argc, char const *argv[])
 {
 
+    /* TEST DE CONTEXT.C */
+
     context_t moncontext = create_context();
     char * idf = "bonjour";
     int data = 5;
@@ -26,6 +28,11 @@ int main(int argc, char const *argv[])
     printf("ma data vaut %d\n", *p_int);
 
     free_context(moncontext);
+
+
+    /* TEST DE ENV.C */
+
+    
 
     return 0;
 }
