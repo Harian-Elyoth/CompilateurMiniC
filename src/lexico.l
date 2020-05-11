@@ -173,23 +173,21 @@ int yywrap(void) {
 }
 
 
-int main(int argc, char ** argv) {
-
-    
-    if(argc < 2){
-        printf("Vous n'avez pas joints de fichier à compiler !\n");
-        return 0;
-    }
+int main(int argc, char ** argv) 
+{
 
     node_t program_root;
-    parse_args(argc, argv);
+
+    if(parse_args(argc, argv) == -1){return 0;}
     
     #if YYDEBUG
     yydebug = 1;
     #endif
     
     yyin = fopen(infile, "r");
+
     yyparse(&program_root);
+
     printf("\nFin de la parse !\n");
     create_context();
     dump_tree(program_root, "arbre_du_program.dot");

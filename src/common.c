@@ -8,22 +8,96 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
+#include <errno.h>
 
 #include "defs.h"
 #include "common.h"
 
 extern char * infile;
 extern char * outfile;
+extern bool stop_after_syntax;
+extern bool stop_after_verif;
+int trace_level = DEFAULT_TRACE_LEVEL;
+int nb_reg = DEFAULT_MAX_REGS;
 /* A completer */
 
 
-void parse_args(int argc, char ** argv) {
-        FILE *monfichier = fopen(argv[1], "r");
-        if(monfichier == NULL){
-            printf("Fichier introuvable ! \n");
-            return;
+int parse_args(int argc, char ** argv) 
+{
+
+    if (argv[1] == NULL)
+    {
+        printf("\n\nVoici ci-après les option possible pour le compilateur minicc :\n\n\n");
+        printf("-b : Affiche une bannière indiquant le nom du compilateur et des membres du binôme\n\n");
+        printf("-o <filename> : Définit le nom du fichier assembleur produit (défaut : out.s).\n\n");
+        printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 5 (0 = pas de trace ; 5 = toutes les traces ; defaut = 0).\n\n");
+        printf("-r <int> : Définit le nombre maximum de registres à utiliser, entre 4 et 8 (défaut : 8).\n\n");
+        printf("-s : Arrêter la compilation après l’analyse syntaxique (défaut = non).\n\n");
+        printf("-v : Arrêter la compilation après la passe de vérifications (défaut = non).\n\n");
+        printf("-h : Afficher la liste des options (fonction d’usage) et arrêter le parsing des arguments.\n\n");
+        printf("-w : Afficher des messages d'avertissements (warnings) en cours de compilation.\n\n");
+        printf("Remarque : les options ’-s’ et ’-v’ sont incompatibles.\n\n\n");
+        return -1;
+    }
+
+    char option; 
+
+    do
+    {
+        option = getopt(argc,argv,"bo:t:r:svhw");
+
+        //printf("on rentre dans le while\n");
+        switch(option)
+        {
+            case 'b':
+                printf("\n\nCe compilateur de MiniC à été écrit par Elyoth Harian et Enzo Calvino\n");
+                printf("Credit : Mr Quentin Meunier, Lip6\n\n");
+                break;
+
+            case 'o':
+                outfile = optarg;
+                break;
+
+            case 't':
+                trace_level = atoi(optarg);
+                break;
+
+            case 'r':
+                nb_reg = atoi(optarg);
+                break;
+
+            case 's':
+                stop_after_syntax = true;
+                break;
+
+            case 'v':
+                stop_after_verif = true;
+                break;
+
+            case 'h':
+                break;
+
+            case 'w':
+                break;
+
+            default:
+                break;
         }
-        infile = argv[1];
+    }while(option != -1);
+
+    char *minic_file = argv[optind];
+
+    FILE *monfichier = fopen(minic_file, "r");
+
+    if(monfichier == NULL){
+        printf("Fichier introuvable ! \n");
+        return -1;
+    }
+
+    infile = minic_file;
+
+    return 0;
 }
 
 

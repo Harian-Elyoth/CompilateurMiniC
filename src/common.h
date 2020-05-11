@@ -5,7 +5,7 @@
 #include "defs.h"
 
 
-void parse_args(int argc, char ** argv);
+int parse_args(int argc, char ** argv);
 char * strdup(char * s);
 void dump_tree(node_t prog_root, const char * filename);
 const char * node_type2string(node_type t);
