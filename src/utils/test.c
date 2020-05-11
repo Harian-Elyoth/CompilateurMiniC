@@ -1,7 +1,9 @@
 #include "context.h"
+#include "env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
 
 int main(int argc, char const *argv[])
 {
@@ -27,12 +29,23 @@ int main(int argc, char const *argv[])
 
     printf("ma data vaut %d\n", *p_int);
 
-    free_context(moncontext);
-
+    //free_context(moncontext);
+    
 
     /* TEST DE ENV.C */
-
+    //Test pratiquement impossible parcequ'il faudrait utiliser la fonction yyparse
     
+    node_t program_root = malloc(sizeof(node_s));
+    program_root->nature = NODE_PROGRAM;
+    program_root->nops = 2;
+
+    printf("1\n");
+    env_t env_actuel = push_global_context(program_root);
+    printf("2\n");
+    env_actuel = push_context(env_actuel);
+    printf("3\n");
+    env_actuel = pop_context(env_actuel);
+
 
     return 0;
 }

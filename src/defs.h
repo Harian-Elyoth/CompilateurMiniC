@@ -3,14 +3,13 @@
 
 #include <stdint.h>
 
-#include "env.h"
-#include "context.h"
 
 #define NUM_ARCH_REGS 8
 #define DEFAULT_OUTFILE "out.s"
 #define DEFAULT_TRACE_LEVEL 0
 #define DEFAULT_MAX_REGS NUM_ARCH_REGS
 
+int offset = 0;
 
 #define printf_level(level, ...) ({         \
     if (level < trace_level) {              \

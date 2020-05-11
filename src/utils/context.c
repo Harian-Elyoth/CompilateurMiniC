@@ -137,7 +137,6 @@ bool idf_in_context(context_t context, char * idf){
     return true;
 }
 
-
 // Ajoutel’association entre le nom idf et le noeud data dans le contexte context. 
 // Si le nom idf est déjà présent, l’ajout échoue et la fonction retourne false. 
 // Sinon, la fonction retourne true.
@@ -167,4 +166,46 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 		}
 	}
 	return true;
+}
+
+void add_global_from_root(context_t context, node_t root){
+	/*Cette fonction fais un DFS sur l'arbre en partant du noeud root, si il trouve un identifier il l'ajoute dans 
+	mon_ident et si il trouve une value il l'ajoute dans ma data. Vu que c'est un DFS il ajoutera 
+	l'ident et la value d'une meme variable. */
+	printf("Je rentre dans la fonction add_global_from_root\n\n");
+	int * ident_flag = NULL; //flag pour savoir si la variable mon_ident a bien été initialisé.
+	int * data_flag = NULL; //flag pour savoir si la variable ma_data a été initialisé
+	printf("Je vais initialisé mes flags\n\n");
+	//* ident_flag = 0; //SEGFAULT
+	//* data_flag = 0; //SEGFAULT
+	printf("J'ai initialisé mes flags\n\n");
+	char * mon_ident;
+	void * ma_data;
+	if(root == NULL){
+		printf("Mon noeud root n'est pas initialisé, fin de la fonction add_global_from_root\n\n");
+	}
+	printf("Mon pointeur sur root vaut %p\n\n", root);
+	int length = root->nops;
+	printf("length vaut %d\n\n", length);
+	for(int i = 0 ; i < length ; i++){
+		printf("Je fais %d tour de boucle\n\n", i);
+		if(root->nature == NODE_PROGRAM){
+			length = 1;
+		}
+		else if(root->nature == NODE_DECL){
+			if(root->nops == 2){
+				mon_ident = root->opr[0]->ident;
+				*((int * )ma_data) = root->opr[1]->value;
+			}
+			else {
+				mon_ident = root->opr[0]->ident;
+				*((int * )ma_data) = 0;
+			}
+			context_add_element(context, mon_ident, ma_data);
+		}
+		add_global_from_root(context, root->opr[i]);
+	
+	}
+
+
 }
