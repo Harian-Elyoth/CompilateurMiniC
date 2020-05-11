@@ -10,7 +10,7 @@
 
 #include "context.h"
 
-extern int offset;
+
 
 // Alloue un objet de type context_t et le retourne
 
@@ -172,38 +172,39 @@ void add_global_from_root(context_t context, node_t root){
 	/*Cette fonction fais un DFS sur l'arbre en partant du noeud root, si il trouve un identifier il l'ajoute dans 
 	mon_ident et si il trouve une value il l'ajoute dans ma data. Vu que c'est un DFS il ajoutera 
 	l'ident et la value d'une meme variable. */
-	node_t node_actuel = root;
-	int * ident_flag; //flag pour savoir si la variable mon_ident a bien été initialisé.
-	int * data_flag; //flag pour savoir si la variable ma_data a été initialisé
-	* ident_flag = 0;
-	* data_flag = 0;
+	printf("Je rentre dans la fonction add_global_from_root\n\n");
+	int * ident_flag = NULL; //flag pour savoir si la variable mon_ident a bien été initialisé.
+	int * data_flag = NULL; //flag pour savoir si la variable ma_data a été initialisé
+	printf("Je vais initialisé mes flags\n\n");
+	//* ident_flag = 0; //SEGFAULT
+	//* data_flag = 0; //SEGFAULT
+	printf("J'ai initialisé mes flags\n\n");
 	char * mon_ident;
 	void * ma_data;
+	if(root == NULL){
+		printf("Mon noeud root n'est pas initialisé, fin de la fonction add_global_from_root\n\n");
+	}
+	printf("Mon pointeur sur root vaut %p\n\n", root);
 	int length = root->nops;
+	printf("length vaut %d\n\n", length);
 	for(int i = 0 ; i < length ; i++){
-		if(root == NODE_PROGRAM){
-			length = 1; //On veut que les variables globales.
+		printf("Je fais %d tour de boucle\n\n", i);
+		if(root->nature == NODE_PROGRAM){
+			length = 1;
 		}
-		if(root->opr[i] == NODE_IDENT){
-			mon_ident = root->opr[i]->ident;
-			root->opr[i]->offset = offset;
-			offset += 4;
-			ident_flag = 1; 
-		}
-		else if(root->opr[i] == NODE_INTVAL || root->opr[i] == NODE_BOOLVAL){
-			* ((int *)ma_data) = root->opr[i]->value; //A modifier (un concept de pointeur sur void ici)
-			* data_flag = 1;
-		}
-
-		add_from_root(context, root->opr[i]);
-		//En depilant, si c'est un NODE_DECL on l'ajoute a notre context.
-		if(root == NODE_DECL){
-			if(data_flag == 0){
-				//la variable n'a pas été initialisé elle vaut donc 0;
-				* ((int *)ma_data) = 0; //a revoir
+		else if(root->nature == NODE_DECL){
+			if(root->nops == 2){
+				mon_ident = root->opr[0]->ident;
+				*((int * )ma_data) = root->opr[1]->value;
+			}
+			else {
+				mon_ident = root->opr[0]->ident;
+				*((int * )ma_data) = 0;
 			}
 			context_add_element(context, mon_ident, ma_data);
 		}
+		add_global_from_root(context, root->opr[i]);
+	
 	}
 
 

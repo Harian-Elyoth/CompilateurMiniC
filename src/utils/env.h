@@ -2,7 +2,7 @@
 #ifndef _ENV_H_
 #define _ENV_H_
 
-
+extern int global_offset;
 #include "context.h"
 
 

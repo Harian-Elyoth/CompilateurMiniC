@@ -23,13 +23,17 @@ env_t push_global_context(node_t program_root)
 	// Initialise un contexte pour les variables globales et en fait le contexte courant.
 
 	context_t global_context = create_context();//Création du context global
+	printf("J'ai fini de faire le create context\n\n");
 	env_t env_global = malloc(sizeof(env_s));
+
+	printf("J'ai fini de faire le malloc\n\n");
+	
 	env_global->context = global_context;
 	//Le but est, ici, d'initialiser les variables globales. Il faut donc pouvoir récupérer
 	// les NODE_DECL du programme root ainsi que leur data pour les déclarer.
 	//Pour les variables globales on va donc chercher dans le premier fils de program_root
-	add_from_root(global_context, program_root->opr[0]);
-	return global_context;
+	add_global_from_root(global_context, program_root);
+	return env_global;
 
 }
 

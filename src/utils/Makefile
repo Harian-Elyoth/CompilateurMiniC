@@ -1,5 +1,5 @@
 EXE=test
-CFLAGS = -Wall -Werror -std=c99
+CFLAGS = -Wall -std=c99
 
 all: test
 

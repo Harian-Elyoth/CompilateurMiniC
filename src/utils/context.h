@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "../defs.h"
-
+int global_offset;
 #define CODE_ASCII_A 65
 // 26 upper case letters 10 figures, and '_' 
 #define NB_ELEM_ALPHABET 63
