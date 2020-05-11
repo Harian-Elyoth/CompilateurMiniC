@@ -11,6 +11,7 @@
 #define DEFAULT_TRACE_LEVEL 0
 #define DEFAULT_MAX_REGS NUM_ARCH_REGS
 
+int offset = 0;
 
 #define printf_level(level, ...) ({         \
     if (level < trace_level) {              \

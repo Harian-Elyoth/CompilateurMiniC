@@ -10,7 +10,7 @@
 
 #include "context.h"
 
-
+extern int offset;
 
 // Alloue un objet de type context_t et le retourne
 
@@ -186,6 +186,8 @@ void add_global_from_root(context_t context, node_t root){
 		}
 		if(root->opr[i] == NODE_IDENT){
 			mon_ident = root->opr[i]->ident;
+			root->opr[i]->offset = offset;
+			offset += 4;
 			ident_flag = 1; 
 		}
 		else if(root->opr[i] == NODE_INTVAL || root->opr[i] == NODE_BOOLVAL){
