@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "env.h"
-#include "context.h"
 
 #define NUM_ARCH_REGS 8
 #define DEFAULT_OUTFILE "out.s"
