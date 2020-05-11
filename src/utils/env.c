@@ -9,6 +9,8 @@
 #include <getopt.h>
 
 #include "env.h"
+#include "defs.h"
+
 
 /* Note : Une fois les fonctions completees, ne PAS supprimer les commentaires explicatifs !*/
 
@@ -16,22 +18,43 @@
 
 /*FONCTION A APPELER LORS DE LA PASSE 1*/
 
-void push_global_context()
+env_t push_global_context(node_t program_root)
 {
 	// A appeler avant l’analyse de la déclaration des variables globales. 
 	// Initialise un contexte pour les variables globales et en fait le contexte courant.
+
+	context_t global_context = create_context();//Création du context global
+	env_t env_global = malloc(sizeof(env_s));
+	env_global->context = global_context;
+	//Le but est, ici, d'initialiser les variables globales. Il faut donc pouvoir récupérer
+	// les NODE_DECL du programme root ainsi que leur data pour les déclarer.
+	//Pour les variables globales on va donc chercher dans le premier fils de program_root
+	add_from_root(global_context, program_root->opr[0]);
+	return global_context;
+
 }
 
-void push_context()
+
+
+env_t push_context(context_t context_actuel)
 {
 	// A appeler avant l’analyse de la déclaration des variables d’un bloc. 
 	// Initialise un contexte pour les variables locales et en fait le contexte courant.
+	context_t new_context = create_context();
+	env_t new_env = malloc(sizeof(env_s));
+	new_env->context = new_context;
+	new_env->next = context_actuel;
+	return new_env;
 }
 
-void pop_context()
+env_t pop_context(env_t env_actuel)
 {
 	// A appeler à la fin de l’analyse d’un bloc déclarant des variables. 
 	// Cette fonction dépile et libère le contexte courant.
+	env_t above_env = env_actuel->next;
+	free_context(env_actuel->context);
+	free(env_actuel);
+	return above_env;
 }
 
 int32_t env_add_element(char * ident, void * node, int32_t size)

@@ -137,7 +137,6 @@ bool idf_in_context(context_t context, char * idf){
     return true;
 }
 
-
 // Ajoutel’association entre le nom idf et le noeud data dans le contexte context. 
 // Si le nom idf est déjà présent, l’ajout échoue et la fonction retourne false. 
 // Sinon, la fonction retourne true.
@@ -167,4 +166,42 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 		}
 	}
 	return true;
+}
+
+void add_global_from_root(context_t context, node_t root){
+	/*Cette fonction fais un DFS sur l'arbre en partant du noeud root, si il trouve un identifier il l'ajoute dans 
+	mon_ident et si il trouve une value il l'ajoute dans ma data. Vu que c'est un DFS il ajoutera 
+	l'ident et la value d'une meme variable. */
+	node_t node_actuel = root;
+	int * ident_flag; //flag pour savoir si la variable mon_ident a bien été initialisé.
+	int * data_flag; //flag pour savoir si la variable ma_data a été initialisé
+	* ident_flag = 0;
+	* data_flag = 0;
+	char * mon_ident;
+	void * ma_data;
+	int length = root->nops;
+	for(int i = 0 ; i < length ; i++){
+		if(root == NODE_PROGRAM){
+			length = 1; //On veut que les variables globales.
+		}
+		if(root->opr[i] == NODE_IDENT){
+			mon_ident = root->opr[i]->ident;
+			ident_flag = 1; 
+		}
+		else if(root->opr[i] == NODE_INTVAL || root->opr[i] == NODE_BOOLVAL){
+			ma_data = root->opr[i]->value; //A modifier (un concept de pointeur sur void ici)
+		}
+
+		add_from_root(context, root->opr[i]);
+		//En depilant, si c'est un NODE_DECL on l'ajoute a notre context.
+		if(root == NODE_DECL){
+			if(data_flag == 0){
+				//la variable n'a pas été initialisé elle vaut donc 0;
+				* ma_data = 0; //a revoir
+			}
+			context_add_element(context, mon_ident, ma_data);
+		}
+	}
+
+
 }
