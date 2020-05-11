@@ -191,7 +191,8 @@ void add_global_from_root(context_t context, node_t root){
 			ident_flag = 1; 
 		}
 		else if(root->opr[i] == NODE_INTVAL || root->opr[i] == NODE_BOOLVAL){
-			ma_data = root->opr[i]->value; //A modifier (un concept de pointeur sur void ici)
+			* ((int *)ma_data) = root->opr[i]->value; //A modifier (un concept de pointeur sur void ici)
+			* data_flag = 1;
 		}
 
 		add_from_root(context, root->opr[i]);
@@ -199,7 +200,7 @@ void add_global_from_root(context_t context, node_t root){
 		if(root == NODE_DECL){
 			if(data_flag == 0){
 				//la variable n'a pas été initialisé elle vaut donc 0;
-				* ma_data = 0; //a revoir
+				* ((int *)ma_data) = 0; //a revoir
 			}
 			context_add_element(context, mon_ident, ma_data);
 		}

@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "defs.h"
+#include "../defs.h"
 
 #define CODE_ASCII_A 65
 // 26 upper case letters 10 figures, and '_' 

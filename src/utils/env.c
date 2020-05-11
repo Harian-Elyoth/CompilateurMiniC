@@ -9,7 +9,6 @@
 #include <getopt.h>
 
 #include "env.h"
-#include "defs.h"
 
 
 /* Note : Une fois les fonctions completees, ne PAS supprimer les commentaires explicatifs !*/
@@ -36,14 +35,14 @@ env_t push_global_context(node_t program_root)
 
 
 
-env_t push_context(context_t context_actuel)
+env_t push_context(env_t env_actuel)
 {
 	// A appeler avant l’analyse de la déclaration des variables d’un bloc. 
 	// Initialise un contexte pour les variables locales et en fait le contexte courant.
 	context_t new_context = create_context();
 	env_t new_env = malloc(sizeof(env_s));
 	new_env->context = new_context;
-	new_env->next = context_actuel;
+	new_env->next = env_actuel;
 	return new_env;
 }
 
