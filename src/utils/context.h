@@ -6,7 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include "../defs.h"
-int global_offset;
+
+//int global_offset;
+
 #define CODE_ASCII_A 65
 // 26 upper case letters 10 figures, and '_' 
 #define NB_ELEM_ALPHABET 63
@@ -35,8 +37,6 @@ bool context_add_element(context_t context, char * idf, void * data);
 void * get_data(context_t context, char * idf);
 bool idf_in_context(context_t context, char * idf);
 void add_global_from_root(context_t context, node_t root);
-
-
 
 
 #endif

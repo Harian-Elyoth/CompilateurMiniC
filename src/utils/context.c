@@ -10,8 +10,6 @@
 
 #include "context.h"
 
-
-
 // Alloue un objet de type context_t et le retourne
 
 context_t create_context()

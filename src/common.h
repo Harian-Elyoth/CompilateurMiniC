@@ -5,6 +5,7 @@
 #include "defs.h"
 
 
+void set_trace_level(int trace_level);
 int parse_args(int argc, char ** argv);
 char * strdup(char * s);
 void dump_tree(node_t prog_root, const char * filename);

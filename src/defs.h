@@ -2,6 +2,7 @@
 #define _DEFS_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 #define NUM_ARCH_REGS 8
@@ -9,7 +10,7 @@
 #define DEFAULT_TRACE_LEVEL 0
 #define DEFAULT_MAX_REGS NUM_ARCH_REGS
 
-int offset = 0;
+//extern int local_offset;
 
 #define printf_level(level, ...) ({         \
     if (level < trace_level) {              \

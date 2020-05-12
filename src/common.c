@@ -11,17 +11,64 @@
 #include <string.h>
 #include <errno.h>
 
-#include "defs.h"
 #include "common.h"
+
 
 extern char * infile;
 extern char * outfile;
 extern bool stop_after_syntax;
 extern bool stop_after_verif;
-int trace_level = DEFAULT_TRACE_LEVEL;
-int nb_reg = DEFAULT_MAX_REGS;
+extern int trace_level;
+extern int nb_reg;
 /* A completer */
 
+
+void set_trace_level(int trace_level)
+{
+    switch(trace_level)
+    {
+        case 0:
+            //Affiche les règles acceptées
+            yyset_debug(0);
+    
+            //Affiche les reducing et shifting des règles
+            #if YYDEBUG
+            yydebug = 0;
+            #endif
+            break;
+
+        case 1:
+            //Affiche les règles acceptées
+            yyset_debug(1);
+    
+            //Affiche les reducing et shifting des règles
+            #if YYDEBUG
+            yydebug = 0;
+            #endif
+            break;
+
+        case 2:
+            //Affiche les règles acceptées
+            yyset_debug(1);
+    
+            //Affiche les reducing et shifting des règles
+            #if YYDEBUG
+            yydebug = 1;
+            #endif
+            break;
+
+        case 3:
+            //??
+            break;
+
+        case 4:
+            //??
+            break;
+
+        default:
+            break;
+    }
+}
 
 int parse_args(int argc, char ** argv) 
 {
@@ -220,17 +267,15 @@ static void dump_tree2dot(FILE * f, node_t root) {
 
 
 void dump_tree(node_t prog_root, const char * dotname) {
-    printf("\nDebut du Dump Tree");
+    //printf("\nDebut du Dump Tree");
     FILE * f;
     f = fopen(dotname, "w");
     if(f == NULL){
         printf("\n\nERREUR DANS L'OUVERTURE DU FICHIER !\n\n");
     }
     fprintf(f, "digraph global_vars {\n");
-    printf("\n\n\n");
     dump_tree2dot(f, prog_root);
     fprintf(f, "}");    
-    printf("Fin du Dump Tree\n");
     fclose(f);
 }
 

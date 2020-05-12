@@ -5,10 +5,12 @@
 
 #include "defs.h"
 #include "common.h"
+#include "context.h"
 
 #include "y.tab.h"
 
 void yyerror(char *);
+void yyset_debug(int);
 int yyparse(node_t * program_root);
 int fileno(FILE * stream);
 void analyse_tree(node_t root);
@@ -18,6 +20,8 @@ char * infile = NULL;
 char * outfile = NULL;
 bool stop_after_syntax = false;
 bool stop_after_verif = false;
+int trace_level = DEFAULT_TRACE_LEVEL;
+int nb_reg = DEFAULT_MAX_REGS;
 /* A completer */
 
 #if YYDEBUG
@@ -161,8 +165,8 @@ SAUTDELIGNE     \r\n
 
 
 . {
-                fprintf(stderr, "Error line %d: Lexical error\n", yylineno);
-                exit(1);
+        fprintf(stderr, "Error line %d: Lexical error\n", yylineno);
+        exit(1);
 }
 
 
@@ -179,24 +183,20 @@ int main(int argc, char ** argv)
     node_t program_root;
 
     if(parse_args(argc, argv) == -1){return 0;}
-    
-    #if YYDEBUG
-    yydebug = 1;
-    #endif
+
+    set_trace_level(trace_level);
     
     yyin = fopen(infile, "r");
 
     yyparse(&program_root);
 
-    printf("\nFin de la parse !\n");
+    //printf("\nFin de la parse !\n");
     create_context();
     dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
+
     //analyse_tree(program_root);
     yylex_destroy();
     return 0;
 }
-
-
-
 

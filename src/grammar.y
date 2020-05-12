@@ -8,13 +8,15 @@
 #include <assert.h>
 
 #include "defs.h"
+#include "pass1.h"
+#include "env.h"
+#include "context.h"
 #include "common.h"
 #include "mips_inst.h"
 
-
-
 /* Global variables */
 /* A completer */
+
 extern bool stop_after_syntax;
 extern bool stop_after_verif;
 extern char * infile;
@@ -76,12 +78,9 @@ node_t make_node(node_nature nature, int nops, ...);
 
 %%
 
-
-/* Regles ici */
 program:
         listdeclnonnull maindecl
         {
-            printf("regle : listdeclnonnull maindecl\n");
             $$ = make_node(NODE_PROGRAM, 2, $1, $2);
             *program_root = $$;
         }
@@ -464,8 +463,6 @@ ident:
         TOK_IDENT
         {
             $$ = make_node(NODE_IDENT, 1, yylval.strval); 
-            
-
         }
         ;
 
@@ -503,7 +500,7 @@ node_t make_node(node_nature nature, int nops, ...) {
 
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
-            printf("\n\nMon str vaut %s\n\n", monstr);
+            //printf("\n\nMon str vaut %s\n\n", monstr);
             res->ident = malloc(sizeof(char)*strlen(monstr));
             res->ident = monstr;
             break;
