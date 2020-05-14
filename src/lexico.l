@@ -22,6 +22,7 @@ bool stop_after_syntax = false;
 bool stop_after_verif = false;
 int trace_level = DEFAULT_TRACE_LEVEL;
 int nb_reg = DEFAULT_MAX_REGS;
+bool print_warning = false;
 /* A completer */
 
 #if YYDEBUG
@@ -190,10 +191,11 @@ int main(int argc, char ** argv)
 
     yyparse(&program_root);
 
-    //printf("\nFin de la parse !\n");
+    printf("\nFin de la parse !\n");
     dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
 
+    printf("Juste avant analyse_tree\n");
     analyse_tree(program_root);
     yylex_destroy();
     return 0;

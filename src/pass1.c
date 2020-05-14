@@ -1,15 +1,18 @@
 #include "pass1.h"
-#include "y.tab.h"
+
+extern bool print_warning;
+
+bool flag_global = true; //flag variable globales
+bool flag_decl = false;  // flag de declaration
+node_type type_actuel = TYPE_NONE; // flag type courant pour la variable déclarée
+bool error_in_program = false; // flag qui indique une erreur dans le prog
 
 void passe_1(node_t root){
-    //Partons du principe que push global context met directement les variables
-    //globales dans le context global et initialise les offset
-    //On pourrait directement appeler pass_1 sur le root->opr[1] soit le NODE FUNC
-    
+
     switch(root->nature)
     {
         char * error_msg;
-
+        printf("je rentre dans pass1\n\n\n\n");
         case NODE_PROGRAM :
             push_global_context();
             break;
@@ -21,7 +24,8 @@ void passe_1(node_t root){
                 int offset_decl = env_add_element(root->ident, (node_t)root, 4);
                 if(offset_decl < 0){
                     sprintf(error_msg, "La variable %s est déjà déclarée\n", root->ident);
-                    yyerror(error_msg);
+                    fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                    exit(1);
                     error_in_program = true;
                 }
                 else {
@@ -34,13 +38,19 @@ void passe_1(node_t root){
                 if(!strcmp(root->ident, "main")){
                     if(root->type != TYPE_VOID){
                         sprintf(error_msg, "le main n'est pas de type void !\n");
-                        yyerror(error_msg);
+                        fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                        exit(1);
                         error_in_program = true;
                     }
                 }
                 if (root->decl_node == NULL){
-                    sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
-                    yyerror(error_msg);
+
+                    if (print_warning)
+                    {
+                        sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
+                        fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                    }
+        
                     error_in_program = true;
                 }
             }
@@ -70,8 +80,6 @@ void passe_1(node_t root){
         case NODE_PLUS :
         case NODE_MUL :
         case NODE_MINUS :
-        case NODE_DIV : 
-        case NODE_MOD : 
         case NODE_LT : 
         case NODE_LE : 
         case NODE_GT : 
@@ -79,9 +87,33 @@ void passe_1(node_t root){
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_BXOR :
-            if(((root->opr[0]->type) != TYPE_INT)||((root->opr[1]->type) != TYPE_INT)){
+            if(((root->opr[0]->type) != TYPE_INT) || ((root->opr[1]->type) != TYPE_INT)){
                 sprintf(error_msg, "Des opérations sur des INT uniquement se font sur d'autres type !\n");
-                yyerror(error_msg);
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
+                error_in_program = true;
+            }
+            root->type = TYPE_INT;
+            break;
+
+        // Ici, on gere en plus la div par 0 ou le modulo 0    
+        case NODE_MOD :    
+        case NODE_DIV : 
+            if(((root->opr[0]->type) != TYPE_INT) || ((root->opr[1]->type) != TYPE_INT)){
+
+                sprintf(error_msg, "Des opérations sur des INT uniquement se font sur d'autres type !\n");
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
+                error_in_program = true;
+            }
+            if((root->opr[1]->value) == 0){
+
+                if (print_warning)
+                {
+                    sprintf(error_msg, "Division par 0 ou Modulo 0 !\n");
+                    fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                }
+                
                 error_in_program = true;
             }
             root->type = TYPE_INT;
@@ -91,7 +123,8 @@ void passe_1(node_t root){
         case NODE_OR : 
             if(((root->opr[0]->type) != TYPE_BOOL)||((root->opr[1]->type) != TYPE_BOOL)){
                 sprintf(error_msg, "Des opérations sur des BOOL uniquement se font sur d'autres type !\n");
-                yyerror(error_msg);
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
                 error_in_program = true;
             }
             root->type = TYPE_BOOL;
@@ -102,22 +135,36 @@ void passe_1(node_t root){
         case NODE_AFFECT : 
             if((root->opr[0]->type != root->opr[1]->type)){
                 sprintf(error_msg, "Des opérations se font entre un INT et un BOOL ! \n");
-                yyerror(error_msg);
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
                 error_in_program = true;
             }
             root->type = root->opr[0]->type;
+        default:
+            break;
 
     }
+
+    printf("Je sors du switch de pass1\n");
 
     for(int i = 0 ; i < root->nops ; i++){
-        passe_1(root->opr[i]);
+
+        const char * nature = node_nature2string(root->nature); 
+        printf("node actuel (dans for) : %s\n", nature);
+
+        if (root->opr[i] != NULL)
+        {
+            printf("Je passe au node suivant\n");
+            passe_1(root->opr[i]);
+        }
+        
     }
+
+    const char * nature = node_nature2string(root->nature); 
+    printf("node actuel (apres for) : %s\n", nature);
 
     if(root->nature = NODE_FUNC){
         root->stack_size = global_offset - env_actuel->env_offset;
     }
-    // *Analyse des declarations des variables globales*
-
-
 
 }

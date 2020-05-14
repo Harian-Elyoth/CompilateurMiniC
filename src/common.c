@@ -12,6 +12,7 @@
 #include <errno.h>
 
 #include "common.h"
+#include "y.tab.h"
 
 
 extern char * infile;
@@ -20,6 +21,9 @@ extern bool stop_after_syntax;
 extern bool stop_after_verif;
 extern int trace_level;
 extern int nb_reg;
+extern bool print_warning;
+
+extern int yy_flex_debug;
 /* A completer */
 
 
@@ -29,7 +33,7 @@ void set_trace_level(int trace_level)
     {
         case 0:
             //Affiche les règles acceptées
-            yyset_debug(0);
+            yy_flex_debug = 0;
     
             //Affiche les reducing et shifting des règles
             #if YYDEBUG
@@ -39,7 +43,7 @@ void set_trace_level(int trace_level)
 
         case 1:
             //Affiche les règles acceptées
-            yyset_debug(1);
+            yy_flex_debug = 1;
     
             //Affiche les reducing et shifting des règles
             #if YYDEBUG
@@ -49,7 +53,7 @@ void set_trace_level(int trace_level)
 
         case 2:
             //Affiche les règles acceptées
-            yyset_debug(1);
+            yy_flex_debug = 1;
     
             //Affiche les reducing et shifting des règles
             #if YYDEBUG
@@ -126,6 +130,7 @@ int parse_args(int argc, char ** argv)
                 break;
 
             case 'w':
+                print_warning = true;
                 break;
 
             default:
@@ -267,7 +272,7 @@ static void dump_tree2dot(FILE * f, node_t root) {
 
 
 void dump_tree(node_t prog_root, const char * dotname) {
-    //printf("\nDebut du Dump Tree");
+    printf("\nDebut du Dump Tree\n\n");
     FILE * f;
     f = fopen(dotname, "w");
     if(f == NULL){
@@ -276,6 +281,7 @@ void dump_tree(node_t prog_root, const char * dotname) {
     fprintf(f, "digraph global_vars {\n");
     dump_tree2dot(f, prog_root);
     fprintf(f, "}");    
+    printf("\n\n\nFin du Dump Tree\n\n\n");
     fclose(f);
 }
 

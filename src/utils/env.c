@@ -9,6 +9,9 @@
 #include <getopt.h>
 
 #include "env.h"
+#include "context.h"
+
+int32_t global_offset = 0;
 
 
 /* Note : Une fois les fonctions completees, ne PAS supprimer les commentaires explicatifs !*/
@@ -29,6 +32,8 @@ void push_global_context()
 	printf("J'ai fini de faire le malloc\n\n");
 	
 	env_actuel->context = global_context;
+
+	printf("J'ai fini l'affectation du context\n");
 	//Le but est, ici, d'initialiser les variables globales. Il faut donc pouvoir récupérer
 	// les NODE_DECL du programme root ainsi que leur data pour les déclarer.
 	//Pour les variables globales on va donc chercher dans le premier fils de program_root
@@ -69,8 +74,9 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement; 
 	// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
 	
+	void * node_value = (int *)(&((node_t)node)->value);
 
-	if(!(context_add_element(env_actuel->context, (node_t)node, ident, ((node_t)node)->value))){
+	if(!(context_add_element(env_actuel->context, (node_t)node, ident, node_value))){
 		return -1;
 	}
 	else {

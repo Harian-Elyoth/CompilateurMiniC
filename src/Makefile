@@ -16,8 +16,8 @@ INCLUDE = -I$(UTILS)
 
 all: minicc
 
-minicc: y.tab.o lex.yy.o common.o context.o pass1.o
-	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) y.tab.o lex.yy.o common.o context.o -o $@ 
+minicc: y.tab.o lex.yy.o common.o context.o env.o pass1.o
+	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) $^ -o $@ 
 
 y.tab.c: grammar.y Makefile
 	yacc -d grammar.y --debug --verbose
@@ -35,6 +35,9 @@ common.o: common.c common.h defs.h Makefile
 	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 context.o: $(UTILS)/context.c $(UTILS)/context.h defs.h 
+	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+env.o: $(UTILS)/env.c $(UTILS)/env.h defs.h 
 	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 pass1.o : pass1.c pass1.h defs.h

@@ -36,6 +36,7 @@ void free_context(context_t context);
 void free_noeud(noeud_t noeud);
 bool context_add_element(context_t context, node_t node, char * idf, void * data);
 void * get_data(context_t context, char * idf);
+void * get_node(context_t context, char *idf);
 bool idf_in_context(context_t context, char * idf);
 //void add_global_from_root(context_t context, node_t root);
 

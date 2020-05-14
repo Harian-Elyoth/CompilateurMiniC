@@ -9,8 +9,8 @@
 
 #include "defs.h"
 #include "pass1.h"
-#include "env.h"
-#include "context.h"
+#include "utils/env.h"
+#include "utils/context.h"
 #include "common.h"
 #include "mips_inst.h"
 
@@ -412,7 +412,7 @@ expr:
         | 
         TOK_INTVAL
         {
-            $$ = make_node(NODE_INTVAL, 1);
+            $$ = make_node(NODE_INTVAL, 0);
             
         }
         | 
@@ -477,27 +477,24 @@ node_t make_node(node_nature nature, int nops, ...) {
         printf("ERREUR D'ALLOCATION MEMOIRE DANS LE MAKENODE");
         return 0;
     }
-    else {
         
-        if(nops < 1){
-
-            printf("ERREUR DE NOPS DANS LE MAKENODE");
-
-            return NULL;
-        }
     res->opr = malloc(sizeof(node_t)*nops);
     
     res->nature = nature;
     res->lineno = yylineno;
     res->nops = nops;
     va_start(ap, nops);
+
     switch(nature){
         case NODE_TYPE :
+            //printf("nops de TYPE = %d\n\n", nops);
+            //res->opr = malloc(sizeof(node_t)*(nops-1));
             res->type = va_arg(ap, node_type);
             break;
 
         case NODE_IDENT :
 
+            //res->opr = malloc(sizeof(node_t)*(nops-1));
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
             //printf("\n\nMon str vaut %s\n\n", monstr);
@@ -506,16 +503,19 @@ node_t make_node(node_nature nature, int nops, ...) {
             break;
         
         case NODE_INTVAL :
+            //res->opr = malloc(sizeof(node_t)*nops);
             res->type = TYPE_NONE;
             res->value = yylval.intval;
             break;
         
         case NODE_STRINGVAL :
+            //res->opr = malloc(sizeof(node_t)*(nops-1));
             res->type = TYPE_NONE;
             res->str = yylval.strval;
             break;
 
         case NODE_BOOLVAL :
+            //res->opr = malloc(sizeof(node_t)*(nops-1));
             res->type = TYPE_NONE;
             if(va_arg(ap, char *) == "true")
                 res->value = 1;
@@ -524,6 +524,7 @@ node_t make_node(node_nature nature, int nops, ...) {
             break;
 
         default :
+            //res->opr = malloc(sizeof(node_t)*nops);
             res->type = TYPE_NONE;
             for(int i = 0 ; i < nops ; i++){
                 res->opr[i] = va_arg(ap, node_t);
@@ -532,8 +533,6 @@ node_t make_node(node_nature nature, int nops, ...) {
         }
     va_end(ap);
     return res;
-
-    }
 }
 
 
