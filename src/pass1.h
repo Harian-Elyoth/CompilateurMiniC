@@ -1,6 +1,11 @@
 #ifndef _PASS1_H_
 #define _PASS1_H_
 
+
+#include "defs.h"
+#include "utils/context.h"
+#include "env.h"
+
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,9 +16,6 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#include "defs.h"
-#include "context.h"
-#include "env.h"
 
 bool flag_global = true; //flag qui nous indique si nous faisons des declarations de variable globales
 bool flag_decl = false; 

@@ -1,3 +1,5 @@
+#include "pass1.h"
+#include "y.tab.h"
 
 void passe_1(node_t root){
     //Partons du principe que push global context met directement les variables
@@ -16,7 +18,7 @@ void passe_1(node_t root){
             root->global_decl = flag_global; 
             root->type = type_actuel;
             if(flag_decl){ // declaration
-                int offset_decl = env_add_element(root->ident, (node_t)root, 4) < 0)
+                int offset_decl = env_add_element(root->ident, (node_t)root, 4);
                 if(offset_decl < 0){
                     sprintf(error_msg, "La variable %s est déjà déclarée\n", root->ident);
                     yyerror(error_msg);
@@ -36,7 +38,7 @@ void passe_1(node_t root){
                         error_in_program = true;
                     }
                 }
-                else if (root->decl_node == NULL){
+                if (root->decl_node == NULL){
                     sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
                     yyerror(error_msg);
                     error_in_program = true;
@@ -77,7 +79,7 @@ void passe_1(node_t root){
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_BXOR :
-            if(((root->opr[0]->type) != TYPE_INT)||((root->opr[1]->type) != TYPE_INT))){
+            if(((root->opr[0]->type) != TYPE_INT)||((root->opr[1]->type) != TYPE_INT)){
                 sprintf(error_msg, "Des opérations sur des INT uniquement se font sur d'autres type !\n");
                 yyerror(error_msg);
                 error_in_program = true;
@@ -87,7 +89,7 @@ void passe_1(node_t root){
         //operations entre BOOL
         case NODE_AND : 
         case NODE_OR : 
-            if(((root->opr[0]->type) != TYPE_BOOL)||((root->opr[1]->type) != TYPE_BOOL))){
+            if(((root->opr[0]->type) != TYPE_BOOL)||((root->opr[1]->type) != TYPE_BOOL)){
                 sprintf(error_msg, "Des opérations sur des BOOL uniquement se font sur d'autres type !\n");
                 yyerror(error_msg);
                 error_in_program = true;
@@ -103,7 +105,7 @@ void passe_1(node_t root){
                 yyerror(error_msg);
                 error_in_program = true;
             }
-            root->type = root->opr[0]
+            root->type = root->opr[0]->type;
 
     }
 
@@ -118,5 +120,4 @@ void passe_1(node_t root){
 
 
 
-    }
 }
