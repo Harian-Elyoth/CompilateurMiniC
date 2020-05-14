@@ -437,12 +437,12 @@ expr:
 listparamprint: 
         listparamprint TOK_COMMA paramprint
         {
-
+            $$   = make_node(NODE_LIST, 2 , $1, $3);
         }
         |
         paramprint
         {
-
+            $$ = $1;
         }
         ;
 
@@ -539,19 +539,19 @@ node_t make_node(node_nature nature, int nops, ...) {
 
 
 /* A completer */
-/*void analyse_tree(node_t root) {
+void analyse_tree(node_t root) {
     if (!stop_after_syntax) {
         passe_1(root);
-        if (!stop_after_verif) {
+        /*if (!stop_after_verif) {
             create_program(); 
             // Appeler la passe 2
 
             dump_mips_program(outfile);
             free_program();
-        }
-        free_global_strings();
+        }*/
+        //free_global_strings();
     }
-}*/
+}
 
 
 

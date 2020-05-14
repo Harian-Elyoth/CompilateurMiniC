@@ -2464,11 +2464,10 @@ int main(int argc, char ** argv)
     yyparse(&program_root);
 
     //printf("\nFin de la parse !\n");
-    create_context();
     dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
 
-    //analyse_tree(program_root);
+    analyse_tree(program_root);
     yylex_destroy();
     return 0;
 }

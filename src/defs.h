@@ -18,8 +18,6 @@
     }                                       \
 })
 
-
-
 typedef enum node_nature_s {
     NONE,
     NODE_PROGRAM,

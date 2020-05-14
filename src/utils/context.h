@@ -18,6 +18,7 @@ typedef struct _noeud_s {
    struct _noeud_s * suite_idf[NB_ELEM_ALPHABET];
    char lettre;
    void * data; // node_t corresponding to the variable decl
+   node_t node;
 } noeud_s;
 
 typedef noeud_s * noeud_t;
@@ -33,10 +34,10 @@ typedef context_s * context_t;
 context_t create_context();
 void free_context(context_t context);
 void free_noeud(noeud_t noeud);
-bool context_add_element(context_t context, char * idf, void * data);
+bool context_add_element(context_t context, node_t node, char * idf, void * data);
 void * get_data(context_t context, char * idf);
 bool idf_in_context(context_t context, char * idf);
-void add_global_from_root(context_t context, node_t root);
+//void add_global_from_root(context_t context, node_t root);
 
 
 #endif

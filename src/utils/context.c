@@ -68,6 +68,49 @@ void * get_data(context_t context, char * idf)
 	}
 }
 
+void * get_node(context_t context, char *idf){
+	
+	void * node;
+
+	if(idf_in_context(context, idf) == false){
+		printf("%s n'existe pas dans ce context\n",idf);
+		return NULL;
+	}
+	else {
+		
+		noeud_t noeud_actuel = context->root;
+		char * char_actuel = idf;
+		int longueur_idf = strlen(idf);
+		//permet de passer le noeud racine
+		noeud_actuel = noeud_actuel->suite_idf[char_actuel[0] - CODE_ASCII_A];
+
+		for(int i = 1 ; i <= longueur_idf ; i ++){
+
+			if(i == longueur_idf){
+				
+				node = noeud_actuel->node;
+
+				if (node == NULL)
+				{
+					printf(" NON ALLOUE, FOR\n");
+					
+				}
+				return node;
+			}
+			else
+			{
+				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
+			}
+		}
+		node = noeud_actuel->node;
+		if (node == NULL)
+				{
+					printf("DATA NON ALLOUE, END\n");
+				}
+		return node;
+	}
+}
+
 // Libère la mémoire allouée pour context.
 
 void free_context(context_t context)
@@ -139,7 +182,7 @@ bool idf_in_context(context_t context, char * idf){
 // Si le nom idf est déjà présent, l’ajout échoue et la fonction retourne false. 
 // Sinon, la fonction retourne true.
 
-bool context_add_element(context_t context, char * idf, void * data_argument){
+bool context_add_element(context_t context, node_t node, char * idf, void * data_argument){
 
 	if(idf_in_context(context, idf)){
 		return false;
@@ -160,16 +203,17 @@ bool context_add_element(context_t context, char * idf, void * data_argument){
 			if(i == longueur_idf - 1){
 				noeud_actuel->data = malloc(sizeof(int));
 				noeud_actuel->data = (void *)data_argument;
+				noeud_actuel->node = node;
 			}
 		}
 	}
 	return true;
 }
-
+/*
 void add_global_from_root(context_t context, node_t root){
 	/*Cette fonction fais un DFS sur l'arbre en partant du noeud root, si il trouve un identifier il l'ajoute dans 
 	mon_ident et si il trouve une value il l'ajoute dans ma data. Vu que c'est un DFS il ajoutera 
-	l'ident et la value d'une meme variable. */
+	l'ident et la value d'une meme variable. 
 	printf("Je rentre dans la fonction add_global_from_root\n\n");
 	int * ident_flag = NULL; //flag pour savoir si la variable mon_ident a bien été initialisé.
 	int * data_flag = NULL; //flag pour savoir si la variable ma_data a été initialisé
@@ -188,7 +232,7 @@ void add_global_from_root(context_t context, node_t root){
 	for(int i = 0 ; i < length ; i++){
 		printf("Je fais %d tour de boucle\n\n", i);
 		if(root->nature == NODE_PROGRAM){
-			length = 1;
+			length = 1;	
 		}
 		else if(root->nature == NODE_DECL){
 			if(root->nops == 2){
@@ -206,4 +250,4 @@ void add_global_from_root(context_t context, node_t root){
 	}
 
 
-}
+}*/

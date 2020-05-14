@@ -2,7 +2,7 @@
 #ifndef _ENV_H_
 #define _ENV_H_
 
-extern int global_offset;
+extern int32_t global_offset;
 #include "context.h"
 
 
@@ -10,15 +10,17 @@ extern int global_offset;
 typedef struct _env_s {
     struct _env_s * next;
     context_t context;
+    int env_offset;
 } env_s;
 
 typedef env_s * env_t;
 
+env_t env_actuel;
 
 
-env_t push_global_context(node_t program_root);
-env_t push_context(env_t env_actuel);
-env_t pop_context(env_t env_actuel);
+void push_global_context();
+void push_context();
+void pop_context();
 void * get_decl_node(char * ident);
 int32_t env_add_element(char * ident, void * node, int32_t size);
 void reset_env_current_offset();

@@ -17,29 +17,28 @@
 
 /*FONCTION A APPELER LORS DE LA PASSE 1*/
 
-env_t push_global_context(node_t program_root)
+void push_global_context()
 {
 	// A appeler avant l’analyse de la déclaration des variables globales. 
 	// Initialise un contexte pour les variables globales et en fait le contexte courant.
 
 	context_t global_context = create_context();//Création du context global
 	printf("J'ai fini de faire le create context\n\n");
-	env_t env_global = malloc(sizeof(env_s));
+	env_t env_actuel = malloc(sizeof(env_s));
 
 	printf("J'ai fini de faire le malloc\n\n");
 	
-	env_global->context = global_context;
+	env_actuel->context = global_context;
 	//Le but est, ici, d'initialiser les variables globales. Il faut donc pouvoir récupérer
 	// les NODE_DECL du programme root ainsi que leur data pour les déclarer.
 	//Pour les variables globales on va donc chercher dans le premier fils de program_root
-	add_global_from_root(global_context, program_root);
-	return env_global;
+
 
 }
 
 
 
-env_t push_context(env_t env_actuel)
+void push_context()
 {
 	// A appeler avant l’analyse de la déclaration des variables d’un bloc. 
 	// Initialise un contexte pour les variables locales et en fait le contexte courant.
@@ -47,17 +46,19 @@ env_t push_context(env_t env_actuel)
 	env_t new_env = malloc(sizeof(env_s));
 	new_env->context = new_context;
 	new_env->next = env_actuel;
-	return new_env;
+	env_actuel = new_env;
+
 }
 
-env_t pop_context(env_t env_actuel)
+void pop_context()
 {
 	// A appeler à la fin de l’analyse d’un bloc déclarant des variables. 
 	// Cette fonction dépile et libère le contexte courant.
 	env_t above_env = env_actuel->next;
 	free_context(env_actuel->context);
 	free(env_actuel);
-	return above_env;
+	env_actuel = above_env;
+
 }
 
 int32_t env_add_element(char * ident, void * node, int32_t size)
@@ -67,15 +68,30 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	// (en pile ou en section .data), et peut être mis toujours à 4. 
 	// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement; 
 	// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
+	
 
-	return 0;
+	if(!(context_add_element(env_actuel->context, (node_t)node, ident, ((node_t)node)->value))){
+		return -1;
+	}
+	else {
+		global_offset += size;
+		return (global_offset - env_actuel->env_offset);
+	}
+
 }
 
 void * get_decl_node(char * ident)
 {
 	// Retourne la définition de la variable ident rencontrée en premier 
 	// dans l’empilement des contextes, en commençant par le contexte courant.
-
+	env_t env_courant = env_actuel;
+	while(env_courant != NULL){
+		if(idf_in_context(env_courant->context, ident))
+			return get_node(env_courant->context, ident);
+		else {
+			env_courant = env_courant->next;
+		}
+	}
 	return NULL;
 }
 
