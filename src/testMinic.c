@@ -1,4 +1,4 @@
-int a = 1, b;
+int a = 153, b;
 bool c = true;
 void main()
 {

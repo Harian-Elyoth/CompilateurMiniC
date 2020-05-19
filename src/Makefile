@@ -17,7 +17,7 @@ INCLUDE = -I$(UTILS)
 all: minicc
 
 minicc: y.tab.o lex.yy.o common.o context.o env.o pass1.o
-	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) $^ -o $@ 
+	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) $^ -o $@ -lminiccutils
 
 y.tab.c: grammar.y Makefile
 	yacc -d grammar.y --debug --verbose

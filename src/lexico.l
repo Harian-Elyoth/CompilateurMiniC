@@ -197,6 +197,7 @@ int main(int argc, char ** argv)
 
     printf("Juste avant analyse_tree\n");
     analyse_tree(program_root);
+    dump_tree(program_root, "post_pass1.dot");
     yylex_destroy();
     return 0;
 }

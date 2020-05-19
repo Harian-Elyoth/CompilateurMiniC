@@ -72,6 +72,8 @@ void * get_node(context_t context, char *idf){
 	
 	void * node;
 
+	printf("je rentre dans get_node\n");
+
 	if(idf_in_context(context, idf) == false){
 		printf("%s n'existe pas dans ce context\n",idf);
 		return NULL;
@@ -184,7 +186,10 @@ bool idf_in_context(context_t context, char * idf){
 
 bool context_add_element(context_t context, node_t node, char * idf, void * data_argument){
 
+	printf("je rentre dans context_add_element\n\n\n");
+
 	if(idf_in_context(context, idf)){
+		printf("on rentre dans le if de context_add_element\n");
 		return false;
 	}
 	else {
