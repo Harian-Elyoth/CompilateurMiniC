@@ -31,6 +31,7 @@ void push_global_context()
 
 	printf("J'ai fini de faire le malloc\n\n");
 	
+	env_actuel->next = NULL;
 	env_actuel->context = global_context;
 	env_actuel->env_offset = 0;
 
@@ -76,7 +77,6 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement; 
 	// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
 	
-	printf("je rentre dans env_add_element\n");
 	void * node_value;
 	if (node == NULL)
 	{
@@ -99,8 +99,6 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 
 	bool ret = context_add_element(env_actuel->context, (node_t)node, ident, node_value);
 
-	printf("context_add_element renvoi : %d\n",ret);
-
 	if(ret == false){
 		printf("une variable du meme nom existe deja\n");
 		return -1;
@@ -121,22 +119,19 @@ void * get_decl_node(char * ident)
 {
 	// Retourne la définition de la variable ident rencontrée en premier 
 	// dans l’empilement des contextes, en commençant par le contexte courant.
-	printf("je rentre dans get_decl_node\n");
 	env_t env_courant = env_actuel;
-
+	int i = 0;
 	while(env_courant != NULL){
-
 		if(idf_in_context(env_courant->context, ident))
 		{
 			return get_node(env_courant->context, ident);
 		}
 		else 
 		{
-			printf("on remonte d'un environnement\n");
 			env_courant = env_courant->next;
 		}
+		i++;
 	}
-	printf("on renvoie null\n\n\n");
 	return NULL;
 }
 

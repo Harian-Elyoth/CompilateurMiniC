@@ -11,7 +11,7 @@ void passe_1(node_t root){
 
     switch(root->nature)
     {
-        char * error_msg;
+        char error_msg[100];// = malloc(sizeof(char)*100);
         printf("je rentre dans pass1\n\n");
         case NODE_PROGRAM :
             push_global_context();
@@ -36,14 +36,11 @@ void passe_1(node_t root){
                 else
                 {    
                     root->decl_node = (node_t)get_decl_node(root->ident);
-                    const char * nature = node_nature2string(root->decl_node->nature);
-                    printf("la nature du node est : %s\n", nature);
                 }
                 if (root->decl_node == NULL)
                 {
-                    //printf("le decl_node est NULL\n");
                     if (print_warning)
-                    {
+                    {                        
                         sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
                         fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
                     }
@@ -106,6 +103,9 @@ void passe_1(node_t root){
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_BXOR :
+        case NODE_SLL :
+        case NODE_SRL :
+        case NODE_SRA :
         case NODE_PLUS :
 
             for (int i = 0; i < root->nops; ++i)
@@ -188,7 +188,11 @@ void passe_1(node_t root){
                 error_in_program = true;
             }
             root->type = root->opr[0]->type;
+            break;
 
+        case NODE_IF:
+
+            break;
         default:
             break;
 
@@ -222,9 +226,8 @@ void passe_1(node_t root){
                 const char * nature = node_nature2string(root->nature); 
                 printf("node actuel : %s\n\n", nature);
 
-                if (root->opr[i] != NULL )
+                if (root->opr[i] != NULL)
                 {
-                    printf("Je passe au node suivant\n");
                     passe_1(root->opr[i]);
                 }  
             }

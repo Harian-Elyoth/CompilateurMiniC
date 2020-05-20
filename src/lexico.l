@@ -59,8 +59,6 @@ SAUTDELIGNE     \r\n
 
 "int"           return TOK_INT;
 
-
-
 "bool"          return TOK_BOOL;
 
 "="             return TOK_AFFECT;

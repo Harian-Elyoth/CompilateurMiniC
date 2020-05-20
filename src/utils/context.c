@@ -163,12 +163,14 @@ bool idf_in_context(context_t context, char * idf){
 
             if (noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] != NULL)
             {
+
             	if((noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A])->idf_existant)// Si la lettre existe
             	{
 				//On passe a la lettre suivante				
 				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
             	}
-            	else {
+            	else 
+            	{
                 	return false;
             	}
             }
@@ -186,10 +188,7 @@ bool idf_in_context(context_t context, char * idf){
 
 bool context_add_element(context_t context, node_t node, char * idf, void * data_argument){
 
-	printf("je rentre dans context_add_element\n\n\n");
-
 	if(idf_in_context(context, idf)){
-		printf("on rentre dans le if de context_add_element\n");
 		return false;
 	}
 	else {
