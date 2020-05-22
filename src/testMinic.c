@@ -1,12 +1,7 @@
-int bonjour = 5;
-bool vrai = true;
+int b = 5;
+bool v = true;
 
 void main()
 {
-    int aqu = 2;
-    
-    if (aqu > bonjour)
-    {
-    	
-    }
+    int c = 2;
 }

@@ -6,6 +6,8 @@
 #include "utils/env.h"
 #include "y.tab.h"
 #include "common.h"
+#include "utils/registers.h"
+#include "utils/mips_inst.h"
 
 #include <string.h>
 #include <stdint.h>

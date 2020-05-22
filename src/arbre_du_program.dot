@@ -9,7 +9,7 @@ digraph global_vars {
     edge[tailclip=true];
     N3 -> N4
     N6 [shape=record, label="{{NODE DECL|Nb. ops: 2}}"];
-    N7 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: bonjour|Offset: 0}}"];
+    N7 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: b|Offset: 0}}"];
     N8 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N7 -> N8
@@ -30,7 +30,7 @@ digraph global_vars {
     edge[tailclip=true];
     N10 -> N11
     N13 [shape=record, label="{{NODE DECL|Nb. ops: 2}}"];
-    N14 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: vrai|Offset: 0}}"];
+    N14 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: v|Offset: 0}}"];
     N15 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N14 -> N15
@@ -70,7 +70,7 @@ digraph global_vars {
     edge[tailclip=true];
     N24 -> N25
     N27 [shape=record, label="{{NODE DECL|Nb. ops: 2}}"];
-    N28 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: aqu|Offset: 0}}"];
+    N28 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: c|Offset: 0}}"];
     N29 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N28 -> N29
@@ -83,31 +83,7 @@ digraph global_vars {
     N24 -> N27
     edge[tailclip=true];
     N23 -> N24
-    N31 [shape=record, label="{{NODE IF|Nb. ops: 2}}"];
-    N32 [shape=record, label="{{NODE GT|Type: TYPE NONE|Nb. ops: 2}}"];
-    N33 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: aqu|Offset: 0}}"];
-    N34 [shape=record, label="{{NULL}}"];
-    edge[tailclip=true];
-    N33 -> N34
-    edge[tailclip=true];
-    N32 -> N33
-    N35 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: bonjour|Offset: 0}}"];
-    N36 [shape=record, label="{{NULL}}"];
-    edge[tailclip=true];
-    N35 -> N36
-    edge[tailclip=true];
-    N32 -> N35
-    edge[tailclip=true];
-    N31 -> N32
-    N37 [shape=record, label="{{NODE BLOCK|Nb. ops: 2}}"];
-    N38 [shape=record, label="{{NULL}}"];
-    edge[tailclip=true];
-    N37 -> N38
-    N39 [shape=record, label="{{NULL}}"];
-    edge[tailclip=true];
-    N37 -> N39
-    edge[tailclip=true];
-    N31 -> N37
+    N31 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N23 -> N31
     edge[tailclip=true];

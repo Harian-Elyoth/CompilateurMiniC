@@ -13,6 +13,8 @@
 #include "../common.h"
 
 int32_t global_offset = 0;
+int32_t global_strings_number = 0;
+char ** global_string;
 
 
 /* Note : Une fois les fonctions completees, ne PAS supprimer les commentaires explicatifs !*/
@@ -27,16 +29,13 @@ void push_global_context()
 	// Initialise un contexte pour les variables globales et en fait le contexte courant.
 
 	context_t global_context = create_context();//Création du context global
-	printf("J'ai fini de faire le create context\n\n");
 	env_actuel = malloc(sizeof(env_s));
 
-	printf("J'ai fini de faire le malloc\n\n");
 	
 	env_actuel->next = NULL;
 	env_actuel->context = global_context;
 	env_actuel->env_offset = 0;
 
-	printf("J'ai fini l'affectation du context\n");
 	//Le but est, ici, d'initialiser les variables globales. Il faut donc pouvoir récupérer
 	// les NODE_DECL du programme root ainsi que leur data pour les déclarer.
 	//Pour les variables globales on va donc chercher dans le premier fils de program_root
@@ -67,13 +66,12 @@ void pop_context()
 	free_context(env_actuel->context);
 	free(env_actuel);
 	env_actuel = above_env;
+	printf("on sort de pop_context\n");
 
 }
 
 int32_t env_add_element(char * ident, void * node, int32_t size)
 {
-	
-	printf("JE FAIS env_ADD_ELEMENT AVEC NODE = %s", node_nature2string(((node_t)node)->nature));
 		// Ajoute dans le contexte courant l’association entre le nom ident et le noeud node.
 		// Le paramètre size définit la taille à allouer pour la variable
 		// (en pile ou en section .data), et peut être mis toujours à 4.
@@ -91,29 +89,21 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	{
 		node_value = (int *)(&((node_t)node)->value);
 	}
-	
-
-	printf("j'affecte node_value = %d\n", *(int*)(node_value));
 
 	if (env_actuel->context == NULL)
 	{
 		printf("ERROR\n");
 	}
-	printf("1\n\n");
+
 	bool ret = context_add_element(env_actuel->context, (node_t)node, ident, node_value);
-	printf("2 ret = %d\n\n", ret);
+
 
 	if(ret == false){
 		printf("une variable du meme nom existe deja\n");
 		return -1;
 	}
 	else {
-		printf("3\n\n");
-
 		int offset_ret = global_offset - env_actuel->env_offset;
-
-		printf("je renvoie l'offset qui vaut : %d\n", offset_ret);
-
 		global_offset += size;
 		return offset_ret;
 	}
@@ -171,7 +161,7 @@ int32_t get_global_strings_number()
 	// Cette fonction devrait être utilisée pour la déclaration des chaines littérales 
 	// en section .data.
 
-	return 0;
+	return global_strings_number;
 }
 
 char * get_global_string(int32_t index)
@@ -181,8 +171,15 @@ char * get_global_string(int32_t index)
 	// par get_global_strings_number(). 
 	// Cette fonction devrait être utilisée pour la déclaration des chaines littérales 
 	// en section .data.
-
-	return NULL;
+	if (index < global_strings_number)
+	{
+		return global_string[index];
+	}
+	else
+	{
+		return NULL;
+	}
+	
 }
 
 void free_global_strings()
@@ -190,4 +187,5 @@ void free_global_strings()
 	// Libère la mémoire allouée pour les chaines littérales.
 	// La valeur de retour des fonctions env_add_element() et add_string() 
 	// devrait être stockée dans le champ offset des noeuds adéquats.
+	free(global_string);
 }

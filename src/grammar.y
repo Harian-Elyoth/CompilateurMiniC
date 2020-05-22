@@ -312,6 +312,7 @@ expr:
         TOK_MINUS expr %prec TOK_UMINUS
         {
             //a voir nous ne sommes pas sur
+            $$ = make_node(NODE_UMINUS, 1, $2);
         }
         | 
         expr TOK_GE expr
@@ -510,6 +511,7 @@ node_t make_node(node_nature nature, int nops, ...) {
         case NODE_STRINGVAL :
             //res->opr = malloc(sizeof(node_t)*(nops-1));
             res->type = TYPE_NONE;
+            res->str = malloc(sizeof(char)*strlen(yylval.strval));
             res->str = yylval.strval;
             break;
 
@@ -547,7 +549,7 @@ void analyse_tree(node_t root) {
             dump_mips_program(outfile);
             free_program();
         }*/
-        //free_global_strings();
+        free_global_strings();
     }
 }
 

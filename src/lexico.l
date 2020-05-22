@@ -46,8 +46,8 @@ LETTER_HEXA     [a-fA-Z]
 ENTIER_HEX      0x({CHIFFRE}|{LETTER_HEXA})+
 IDF             {LETTRE}({LETTRE}|{CHIFFRE}|_)*
 ENTIER          {ENTIER_DEC}|{ENTIER_HEX}
-CHAINE_CAR      ([^"/])
-CHAINE          "({CHAINE_CAR}|\"|\n)*"
+CHAINE_CAR      [\x20-\x21\x22-\x5c]
+CHAINE          \"(\\.|[^"\\])*\"
 COMMENTAIRE     \2F\2F{CHAINE_CAR}*
 SPACE           [ \t]+
 SAUTDELIGNE     \r\n
@@ -189,13 +189,11 @@ int main(int argc, char ** argv)
 
     yyparse(&program_root);
 
-    printf("\nFin de la parse !\n");
     dump_tree(program_root, "arbre_du_program.dot");
     fclose(yyin);
 
-    printf("Juste avant analyse_tree\n");
     analyse_tree(program_root);
-    dump_tree(program_root, "post_pass1.dot");
+    //dump_tree(program_root, "post_pass1.dot");
     yylex_destroy();
     return 0;
 }

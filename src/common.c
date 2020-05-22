@@ -272,7 +272,7 @@ static void dump_tree2dot(FILE * f, node_t root) {
 
 
 void dump_tree(node_t prog_root, const char * dotname) {
-    printf("\nDebut du Dump Tree\n\n");
+    printf("\nDebut du Dump Tree\n");
     FILE * f;
     f = fopen(dotname, "w");
     if(f == NULL){
@@ -281,7 +281,7 @@ void dump_tree(node_t prog_root, const char * dotname) {
     fprintf(f, "digraph global_vars {\n");
     dump_tree2dot(f, prog_root);
     fprintf(f, "}");    
-    printf("\n\n\nFin du Dump Tree\n\n\n");
+    printf("Fin du Dump Tree\n");
     fclose(f);
 }
 
