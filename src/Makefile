@@ -11,7 +11,7 @@ else
 	DEBUG_FLAGS=
 endif
 
-CFLAGS = -O0 -g -std=c99 -DYY_NO_LEAKS
+CFLAGS = -fPIC -O0 -g -std=c99 -DYY_NO_LEAKS 
 INCLUDE = -I$(UTILS)
 
 all: minicc

@@ -10,6 +10,7 @@
 
 #include "env.h"
 #include "context.h"
+#include "../common.h"
 
 int32_t global_offset = 0;
 
@@ -71,13 +72,15 @@ void pop_context()
 
 int32_t env_add_element(char * ident, void * node, int32_t size)
 {
-	// Ajoute dans le contexte courant l’association entre le nom ident et le noeud node. 
-	// Le paramètre size définit la taille à allouer pour la variable 
-	// (en pile ou en section .data), et peut être mis toujours à 4. 
-	// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement; 
-	// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
 	
-	void * node_value;
+	printf("JE FAIS env_ADD_ELEMENT AVEC NODE = %s", node_nature2string(((node_t)node)->nature));
+		// Ajoute dans le contexte courant l’association entre le nom ident et le noeud node.
+		// Le paramètre size définit la taille à allouer pour la variable
+		// (en pile ou en section .data), et peut être mis toujours à 4.
+		// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement;
+		// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
+
+		void *node_value;
 	if (node == NULL)
 	{
 		int intval_global = 0;
@@ -96,15 +99,17 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	{
 		printf("ERROR\n");
 	}
-
+	printf("1\n\n");
 	bool ret = context_add_element(env_actuel->context, (node_t)node, ident, node_value);
+	printf("2 ret = %d\n\n", ret);
 
 	if(ret == false){
 		printf("une variable du meme nom existe deja\n");
 		return -1;
 	}
 	else {
-		
+		printf("3\n\n");
+
 		int offset_ret = global_offset - env_actuel->env_offset;
 
 		printf("je renvoie l'offset qui vaut : %d\n", offset_ret);

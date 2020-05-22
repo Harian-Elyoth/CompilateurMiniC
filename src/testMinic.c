@@ -1,9 +1,12 @@
+int bonjour = 5;
+bool vrai = true;
+
 void main()
 {
-    bool c = false;
-    int a = 2;
-    if (c)
+    int aqu = 2;
+    
+    if (aqu > bonjour)
     {
-    	b = a + 12;
+    	
     }
 }

@@ -113,7 +113,6 @@ listdeclnonnull:
         {
             $$ = make_node(NODE_LIST, 2, $1, $2 );
             
-            
         }
         ;
 

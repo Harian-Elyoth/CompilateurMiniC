@@ -9,10 +9,11 @@ bool error_in_program = false; // flag qui indique une erreur dans le prog
 
 void passe_1(node_t root){
 
+    printf("je rentre dans pass1\n\n");
+    char error_msg[100]; // = malloc(sizeof(char)*100);
     switch(root->nature)
     {
-        char error_msg[100];// = malloc(sizeof(char)*100);
-        printf("je rentre dans pass1\n\n");
+        
         case NODE_PROGRAM :
             push_global_context();
             break;
@@ -39,6 +40,8 @@ void passe_1(node_t root){
                 }
                 if (root->decl_node == NULL)
                 {
+                    printf("Je suis dans le if decl_node == NULL\n");
+                    root->type = TYPE_NONE;
                     if (print_warning)
                     {                        
                         sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
@@ -54,6 +57,7 @@ void passe_1(node_t root){
             else
             {
                 flag_decl = false;
+                
             }
             break;
 
@@ -236,7 +240,8 @@ void passe_1(node_t root){
     }
 
     if(root->nature == NODE_FUNC){
-        root->stack_size = global_offset - env_actuel->env_offset;
+        printf("GLOBAL OFFSET == %d et root->offset == %d", global_offset, root->offset);
+        root->stack_size = global_offset - root->offset;
     }
 
 }

@@ -19,6 +19,9 @@ context_t create_context()
 	noeud_t root = context->root;
 	root->idf_existant = true;
 	root->lettre = '/';
+	for(int i = 0 ; i < NB_ELEM_ALPHABET ; i++){
+		root->suite_idf[i] = NULL;
+	}
 	return context;
 }
 
@@ -146,6 +149,7 @@ void free_noeud(noeud_t noeud)
 		}
 	}
 	free(noeud);
+
 }
 
 // Verifie si un idf est present dans un contexte
@@ -156,30 +160,53 @@ bool idf_in_context(context_t context, char * idf){
     noeud_t noeud_actuel = context->root;
     char * char_actuel = idf;
     int longueur_idf = strlen(idf);
+	printf("Je rentre dans IDF in context\n\n\n");
     for(int i = 0 ; i < longueur_idf ; i++){
-
+		
             // On pars du principe que l'allocation se fasse dans l'ordre
             // si on doit allouer un b on le fait a deuxieme case et non a la premiere.
-
-            if (noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] != NULL)
-            {
-
-            	if((noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A])->idf_existant)// Si la lettre existe
-            	{
-				//On passe a la lettre suivante				
+			/*
+			if (noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] != NULL)
+			{
 				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
-            	}
-            	else 
-            	{
-                	return false;
-            	}
+				printf("Je rentre dans le premier if\n\n");
+            	//if((noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A])->idf_existant)// Si la lettre existe
+            	/{
+				//	printf("Je rentre dans le deuxieme if\n\n");
+				//On passe a la lettre suivante				
+				
+            	//}
+            	//else 
+            	//{
+                //	return false;
+            	//}
             }
-            else
-            {
-            	return false;
-            }
+			else if (i == longueur_idf - 1)
+			{
+				if(noeud_actuel->idf_existant){
+				//printf("Je sors au bon endroit\n\n\n");
+            		return true;
+				}
+				else {
+					return false;
+				}
+			}*/
+			printf("la lettre actuelle est %c\n\n", char_actuel[i]);
+			if(noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] == NULL){
+				printf("IDF IN CONTEXT RETURN FALSE\n");
+				return false;
+			}
+			else{
+				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
+				if(i == longueur_idf - 1){
+					printf("IDF IN CONTEXT RETURN %d\n", noeud_actuel->idf_existant);
+					return noeud_actuel->idf_existant;
+				}
+			}
+
 	}
-    return true;
+	printf("LE RETURN DE SECURITE\n\n\n");
+	return true;
 }
 
 // Ajoutel’association entre le nom idf et le noeud data dans le contexte context. 
@@ -189,10 +216,11 @@ bool idf_in_context(context_t context, char * idf){
 bool context_add_element(context_t context, node_t node, char * idf, void * data_argument){
 
 	if(idf_in_context(context, idf)){
+		printf("cae renvois false\n\n");
 		return false;
 	}
 	else {
-
+		printf("je rentre dans le else\n\n\n");
 		noeud_t noeud_actuel = context->root;
 		char * char_actuel = idf;
 		int longueur_idf = strlen(idf);
@@ -202,12 +230,13 @@ bool context_add_element(context_t context, node_t node, char * idf, void * data
 			noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] = malloc(sizeof(noeud_s));
 			noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
 			noeud_actuel->lettre = char_actuel[i];
-			noeud_actuel->idf_existant = true;
+			noeud_actuel->idf_existant = false;
 
 			if(i == longueur_idf - 1){
 				noeud_actuel->data = malloc(sizeof(int));
 				noeud_actuel->data = (void *)data_argument;
 				noeud_actuel->node = node;
+				noeud_actuel->idf_existant = true;
 			}
 		}
 	}
