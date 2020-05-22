@@ -12,6 +12,8 @@
 #include "context.h"
 #include "../common.h"
 
+extern bool flag_global;
+
 int32_t global_offset = 0;
 int32_t global_strings_number = 0;
 char ** global_string;
@@ -78,16 +80,29 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 		// Si la valeur retournée est positive ou nulle, il s’agit de l’offset de la variable dans l’environnement;
 		// si la valeur retournée est négative, cela signifie qu’une variable du même nom existe déjà dans le contexte courant.
 
-		void *node_value;
-	if (node == NULL)
+	void *node_value;
+	node_t node_actuel = (node_t)node;
+
+	if (node_actuel->opr[1] == NULL)
 	{
-		int intval_global = 0;
-		int * intval_global_pt = &intval_global;
-		node_value = (void *)(intval_global_pt);
+		printf("je rentre ici\n");
+		if (flag_global)
+		{
+			int intval_global = 0;
+			int * intval_global_pt = &intval_global;
+			node_value = (void *)(intval_global_pt);
+		}
+		else
+		{
+			int intval_global = -1;
+			int * intval_global_pt = &intval_global;
+			node_value = (void *)(intval_global_pt);
+		}
 	}
 	else
 	{
-		node_value = (int *)(&((node_t)node)->value);
+		node_value = (int *)(&((node_t)(node_actuel->opr[1]))->value);
+		printf("valeur de %s = %d\n",ident,(*((int*)node_value)));
 	}
 
 	if (env_actuel->context == NULL)
@@ -95,7 +110,7 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 		printf("ERROR\n");
 	}
 
-	bool ret = context_add_element(env_actuel->context, (node_t)node, ident, node_value);
+	bool ret = context_add_element(env_actuel->context, (node_t)(node_actuel->opr[0]), ident, node_value);
 
 
 	if(ret == false){

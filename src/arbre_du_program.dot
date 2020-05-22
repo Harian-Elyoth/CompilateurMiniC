@@ -69,23 +69,20 @@ digraph global_vars {
     N25 -> N26
     edge[tailclip=true];
     N24 -> N25
-    N27 [shape=record, label="{{NODE DECL|Nb. ops: 2}}"];
+    N27 [shape=record, label="{{NODE DECL|Nb. ops: 1}}"];
     N28 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: c|Offset: 0}}"];
     N29 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N28 -> N29
     edge[tailclip=true];
     N27 -> N28
-    N30 [shape=record, label="{{NODE INTVAL|Type: TYPE NONE}|{Value: 2}}"];
-    edge[tailclip=true];
-    N27 -> N30
     edge[tailclip=true];
     N24 -> N27
     edge[tailclip=true];
     N23 -> N24
-    N31 [shape=record, label="{{NULL}}"];
+    N30 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
-    N23 -> N31
+    N23 -> N30
     edge[tailclip=true];
     N18 -> N23
     edge[tailclip=true];

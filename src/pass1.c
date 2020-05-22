@@ -236,7 +236,8 @@ void actions_node_ident(node_t root)
             if (print_warning)
             {                        
                 sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
-                fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
             }
             error_in_program = true;
         }
@@ -253,7 +254,7 @@ void actions_node_decl(node_t root)
     flag_decl = true;
 
     //printf("Je suis dans une declaration\n");
-    int offset_decl = env_add_element(root->opr[0]->ident, (node_t)root->opr[0], 4);
+    int offset_decl = env_add_element(root->opr[0]->ident, root, 4);
 
     if(offset_decl < 0){
         sprintf(error_msg, "La variable %s est déjà déclarée\n", root->opr[0]->ident);
