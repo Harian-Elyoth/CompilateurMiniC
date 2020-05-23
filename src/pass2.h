@@ -22,4 +22,6 @@
 void passe_2(node_t root);
 void action_decl(node_t root);
 int32_t action_op(node_t root);
+void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_source2);
+void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm);
 #endif

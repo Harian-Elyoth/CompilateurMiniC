@@ -1,9 +1,8 @@
 
 void main()
 {
-
-	int b = 2;
-
-	b = 2*2+4;
+	int a = 5;
+	int b = 6;
+	bool c = (a < b);
 
 }
