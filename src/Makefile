@@ -16,7 +16,7 @@ INCLUDE = -I$(UTILS)
 
 all: minicc
 
-minicc: y.tab.o lex.yy.o common.o context.o env.o pass1.o
+minicc: y.tab.o lex.yy.o common.o context.o env.o pass1.o pass2.o
 	gcc $(CFLAGS) $(INCLUDE) -L$(UTILS) $^ -o $@ -lminiccutils
 
 y.tab.c: grammar.y Makefile
@@ -41,6 +41,9 @@ env.o: $(UTILS)/env.c $(UTILS)/env.h defs.h
 	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 pass1.o : pass1.c pass1.h defs.h
+	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+pass2.o : pass2.c pass2.h defs.h $(UTILS)/mips_inst.h $(UTILS)/registers.h
 	gcc $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 clean:

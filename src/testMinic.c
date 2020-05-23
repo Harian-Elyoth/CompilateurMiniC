@@ -1,7 +1,9 @@
-int b = 5;
-bool v = true;
 
 void main()
 {
-    int c;
+
+	int b = 2;
+
+	b = 2*2+4;
+
 }

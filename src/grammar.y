@@ -9,6 +9,7 @@
 
 #include "defs.h"
 #include "pass1.h"
+#include "pass2.h"
 #include "utils/env.h"
 #include "utils/context.h"
 #include "common.h"
@@ -544,9 +545,8 @@ void analyse_tree(node_t root) {
         passe_1(root);
         if (!stop_after_verif) {
             create_program(); 
-            // Appeler la passe 2
-
-            //dump_mips_program(outfile);
+            passe_2(root);
+            dump_mips_program(outfile);
             free_program();
         }
         free_global_strings();

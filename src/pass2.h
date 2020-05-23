@@ -20,5 +20,6 @@
 #include <getopt.h>
 
 void passe_2(node_t root);
-
+void action_decl(node_t root);
+int32_t action_op(node_t root);
 #endif

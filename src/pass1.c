@@ -14,6 +14,7 @@ void passe_1(node_t root){
     printf("je rentre dans pass1\n\n");
 
     //TRAITEMENT EFFECTUE EN DESCENDANT DANS L'ARBRE (DFS)
+    char error_msg[100];
 
     switch(root->nature)
     {
@@ -23,6 +24,16 @@ void passe_1(node_t root){
         
         case NODE_IDENT :
             actions_node_ident(root);
+            break;
+
+        case NODE_DECLS :
+            if (root->opr[0]->type == TYPE_VOID)
+            {
+                sprintf(error_msg, "On ne peut pas déclarer de variable de type VOID !\n");
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
+                error_in_program = true;
+            }
             break;
 
         case NODE_DECL :
@@ -35,11 +46,13 @@ void passe_1(node_t root){
 
         case NODE_BLOCK :
             push_context();
+
             break;
 
         case NODE_FUNC :
             reset_temporary_max_offset();
             flag_global = false;
+            //reset_env_current_offset();
             root->offset = global_offset;
             break;
 
@@ -53,9 +66,9 @@ void passe_1(node_t root){
 
         case NODE_STRINGVAL : 
         {
-            global_strings_number++;
-            char ** tab_str = realloc(global_string, sizeof(char*)*global_strings_number);
-            if( tab_str == NULL)
+            
+            char ** tab_str = realloc(global_string, sizeof(char*));
+            if(tab_str == NULL)
             {
                 printf("ERROR ALLOCATION MEMOIRE\n");
                 exit(1);
@@ -64,9 +77,11 @@ void passe_1(node_t root){
             {
                 global_string = tab_str;
             }
+            printf("mon string vaut : %s\n",root->str);
             global_string[global_strings_number] = root->str;
             root->type = TYPE_STRING;
             root->offset = add_string(root->str);
+            global_strings_number++;
             break;
         }
 
@@ -371,4 +386,5 @@ void test_op_cond(node_t root)
         error_in_program = true;
     }
     root->type = TYPE_BOOL;
+
 }

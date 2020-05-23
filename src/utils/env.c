@@ -149,13 +149,13 @@ void reset_env_current_offset()
 {
 	// Réinitialise l’offset courant à 0; cette fonction doit
 	// être appelée au début de l’analyse d’une fonction.
+	env_actuel->env_offset = 0;
 }
 
 int32_t get_env_current_offset()
 {
 	// Retourne l’offset courant du contexte.
-
-	return 0;
+	return env_actuel->env_offset;
 }
 
 int32_t add_string(char * str)
