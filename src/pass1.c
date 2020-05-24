@@ -294,10 +294,6 @@ void test_op(node_t root)
     {
         case NODE_MUL :
         case NODE_MINUS :
-        case NODE_LT : 
-        case NODE_LE : 
-        case NODE_GT : 
-        case NODE_GE : 
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_BXOR :
@@ -319,6 +315,10 @@ void test_op(node_t root)
         }
         break;
 
+        case NODE_LT : 
+        case NODE_LE : 
+        case NODE_GT : 
+        case NODE_GE : 
         case NODE_EQ :
         case NODE_NE :
         case NODE_AFFECT :

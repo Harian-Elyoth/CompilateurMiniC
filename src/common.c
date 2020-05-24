@@ -140,6 +140,7 @@ int parse_args(int argc, char ** argv)
 
     char *minic_file = argv[optind];
 
+
     FILE *monfichier = fopen(minic_file, "r");
 
     if(monfichier == NULL){
@@ -148,6 +149,7 @@ int parse_args(int argc, char ** argv)
     }
 
     infile = minic_file;
+    outfile = "output.s";
 
     return 0;
 }

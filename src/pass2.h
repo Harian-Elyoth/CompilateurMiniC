@@ -25,5 +25,6 @@ int32_t action_op(node_t root);
 void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_source2);
 void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm);
 void load_ident(node_t node, int32_t dest);
-void store_ident(node_t node, int32_t source);
+void store_ident(node_t node, int32_t source, bool is_decl);
+void action_loop(node_t root);
 #endif
