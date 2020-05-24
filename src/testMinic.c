@@ -1,8 +1,7 @@
-
+int a =  5;
 void main()
 {
-	int a = 5;
-	int b = 6;
-	bool c = (a < b);
-
+	int c = a;
+	int b = 4;
 }
+
