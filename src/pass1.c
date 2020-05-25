@@ -8,6 +8,7 @@ bool flag_global = true; //flag variable globales
 bool flag_decl = false;  // flag de declaration
 node_type type_actuel = TYPE_NONE; // flag type courant pour la variable déclarée
 bool error_in_program = false; // flag qui indique une erreur dans le prog
+int32_t stack_size_decl = 0;
 
 void passe_1(node_t root){
 
@@ -159,6 +160,8 @@ void passe_1(node_t root){
         case NODE_FUNC :
         {
             root->stack_size = global_offset - root->offset;
+            stack_size_decl = root->stack_size;
+            root->stack_size += get_temporary_max_offset();
             break;
         }
         case NODE_IF :
@@ -367,7 +370,7 @@ void test_op_type(node_t root, int type)
             error_in_program = true;
         }
     }
-    root->type = TYPE_INT;
+    root->type = type_op;
 }
 
 void test_op_cond(node_t root)

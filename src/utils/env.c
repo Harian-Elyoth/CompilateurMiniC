@@ -15,6 +15,7 @@
 extern bool flag_global;
 
 int32_t global_offset = 0;
+int32_t var_globales_offset = 0;
 int32_t global_strings_number = 0;
 char ** global_string;
 
@@ -82,6 +83,11 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 
 	void *node_value;
 	node_t node_actuel = (node_t)node;
+
+	if (flag_global)
+	{
+		var_globales_offset += 4;
+	}
 
 	if (node_actuel->opr[1] == NULL)
 	{
@@ -161,9 +167,12 @@ int32_t get_env_current_offset()
 int32_t add_string(char * str)
 {
 	// Ajoute la déclaration en section .data d’une chaine de
-	// caractère littérale et retourne l’offset correspondant.	
+	// caractère littérale et retourne l’offset correspondant.
 
-	return 0;
+	int32_t res = var_globales_offset;
+	var_globales_offset += strlen(str);
+	return res;
+		
 }
 
 /*===================================================================*/

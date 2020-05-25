@@ -48,7 +48,7 @@ IDF             {LETTRE}({LETTRE}|{CHIFFRE}|_)*
 ENTIER          {ENTIER_DEC}|{ENTIER_HEX}
 CHAINE_CAR      [\x20-\x21\x22-\x5c]
 CHAINE          \"(\\.|[^"\\])*\"
-COMMENTAIRE     \2F\2F{CHAINE_CAR}*
+COMMENTAIRE     \/\/[\x20-\x7E]*
 SPACE           [ \t]+
 SAUTDELIGNE     \r\n
 
