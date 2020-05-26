@@ -136,10 +136,11 @@ void free_context(context_t context)
 
 void free_noeud(noeud_t noeud)
 {
-	printf("lettre actuelle : %c\n", noeud->lettre);
+	//printf("On rentre dans free_noeud\n");
+	//printf("lettre actuelle : %c\n", noeud->lettre);
 	if (noeud->data != NULL)
 	{
-		printf("on free la data : %d\n", *((int *)noeud->data));
+		//printf("on free la data : %d\n", *((int *)noeud->data));
 		//free((int *)noeud->data);
 		printf("le free data marche pas !\n");
 	}
@@ -150,6 +151,7 @@ void free_noeud(noeud_t noeud)
 			free_noeud(noeud->suite_idf[i]);
 		}
 	}
+
 	free(noeud);
 
 }
@@ -197,8 +199,11 @@ bool context_add_element(context_t context, node_t node, char * idf, void * data
 		char * char_actuel = idf;
 		int longueur_idf = strlen(idf);
 
-		for(int i = 0 ; i < longueur_idf; i++){
-			
+		for(int i = 0 ; i < longueur_idf; i++)
+		{
+
+			printf("char_actuel : %c\n",char_actuel[i]);
+
 			noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] = malloc(sizeof(noeud_s));
 			noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
 			for (int i = 0; i < NB_ELEM_ALPHABET; ++i)
