@@ -107,7 +107,16 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 	}
 	else
 	{
-		node_value = (int *)(&((node_t)(node_actuel->opr[1]))->value);
+		if (node_actuel->opr[1]->nature == NODE_UMINUS)
+		{
+			node_t nd = (node_t)(node_actuel->opr[1]->opr[0]);
+			int val = nd->value*-1;
+			node_value = (int *)(&val);
+		}
+		else
+		{
+			node_value = (int *)(&((node_t)(node_actuel->opr[1]))->value);
+		}
 		printf("valeur de %s = %d\n",ident,(*((int*)node_value)));
 	}
 
@@ -178,7 +187,7 @@ int32_t add_string(char * str)
     global_string[global_strings_number] = str;
 
 	int32_t res = var_globales_offset;
-	var_globales_offset += strlen(str);
+	var_globales_offset += strlen(str) - 1;
 
 	return res;
 		

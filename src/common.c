@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -79,6 +78,7 @@ int parse_args(int argc, char ** argv)
 
     if (argv[1] == NULL)
     {
+        printf("\nErreur, aucun fichier d'entrée fournie.\n\n");
         printf("\n\nVoici ci-après les option possible pour le compilateur minicc :\n\n\n");
         printf("-b : Affiche une bannière indiquant le nom du compilateur et des membres du binôme\n\n");
         printf("-o <filename> : Définit le nom du fichier assembleur produit (défaut : out.s).\n\n");
@@ -98,7 +98,6 @@ int parse_args(int argc, char ** argv)
     {
         option = getopt(argc,argv,"bo:t:r:svhw");
 
-        //printf("on rentre dans le while\n");
         switch(option)
         {
             case 'b':
@@ -127,6 +126,16 @@ int parse_args(int argc, char ** argv)
                 break;
 
             case 'h':
+                printf("\n\nVoici ci-après les option possible pour le compilateur minicc :\n\n\n");
+                printf("-b : Affiche une bannière indiquant le nom du compilateur et des membres du binôme\n\n");
+                printf("-o <filename> : Définit le nom du fichier assembleur produit (défaut : out.s).\n\n");
+                printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 5 (0 = pas de trace ; 5 = toutes les traces ; defaut = 0).\n\n");
+                printf("-r <int> : Définit le nombre maximum de registres à utiliser, entre 4 et 8 (défaut : 8).\n\n");
+                printf("-s : Arrêter la compilation après l’analyse syntaxique (défaut = non).\n\n");
+                printf("-v : Arrêter la compilation après la passe de vérifications (défaut = non).\n\n");
+                printf("-h : Afficher la liste des options (fonction d’usage) et arrêter le parsing des arguments.\n\n");
+                printf("-w : Afficher des messages d'avertissements (warnings) en cours de compilation.\n\n");
+                printf("Remarque : les options ’-s’ et ’-v’ sont incompatibles.\n\n\n");
                 break;
 
             case 'w':
@@ -149,7 +158,7 @@ int parse_args(int argc, char ** argv)
     }
 
     infile = minic_file;
-    outfile = "output.s";
+    outfile = "out.s";
 
     return 0;
 }

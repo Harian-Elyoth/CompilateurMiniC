@@ -13,6 +13,8 @@ int32_t stack_size_decl = 0;
 void passe_1(node_t root){
 
     printf("je rentre dans pass1\n\n");
+    const char * nature = node_nature2string(root->nature); 
+    printf("node actuel : %s\n\n", nature);
 
     //TRAITEMENT EFFECTUE EN DESCENDANT DANS L'ARBRE (DFS)
     char error_msg[100];
@@ -37,6 +39,10 @@ void passe_1(node_t root){
             }
             break;
 
+        case NODE_UMINUS :
+            actions_uminus(root);
+            break;
+
         case NODE_DECL :
             actions_node_decl(root);
             break;
@@ -47,7 +53,6 @@ void passe_1(node_t root){
 
         case NODE_BLOCK :
             push_context();
-
             break;
 
         case NODE_FUNC :
@@ -105,6 +110,7 @@ void passe_1(node_t root){
     {
         case NODE_MUL :
         case NODE_MINUS :
+        case NODE_UMINUS :
         case NODE_LT : 
         case NODE_LE : 
         case NODE_GT : 
@@ -127,9 +133,6 @@ void passe_1(node_t root){
         {
             for(int i = 0 ; i < root->nops ; i++){
 
-                const char * nature = node_nature2string(root->nature); 
-                printf("node actuel : %s\n\n", nature);
-
                 if (root->opr[i] != NULL)
                 {
                     passe_1(root->opr[i]);
@@ -143,6 +146,18 @@ void passe_1(node_t root){
 
     switch(root->nature)
     {
+        case NODE_UMINUS :
+        {
+            if (root->opr[0]->type != TYPE_INT)
+            {
+                sprintf(error_msg, "Un opérateur sur des INT est utilsé sur d'autre type !\n");
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
+                error_in_program = true;
+            }
+            root->type = TYPE_INT;
+            break;
+        }
         case NODE_FUNC :
         {
             root->stack_size = global_offset - root->offset;
@@ -313,11 +328,16 @@ void test_op(node_t root)
         {
             test_op_cond(root);
         }
+        break;
+
+        default:
+            break;
     }
 }
 
 void test_op_type(node_t root, int type)
 {
+    printf("JE RENTRE DANS test_op_type\n");
     int is_allocate = 0;
     int is_push = 0;
 
@@ -356,9 +376,13 @@ void test_op_type(node_t root, int type)
 
     for (int i = 0; i < root->nops; ++i)
     {
-        passe_1(root->opr[i]);
+        printf("tour de boucle : %d\n", i);
+        if (root->opr[i]->nature != NODE_INTVAL && root->opr[i]->nature != NODE_BOOLVAL)
+        {
+            passe_1(root->opr[i]);
+        }
     }
-    
+
     if(((root->opr[0]->type) != type_op) || ((root->opr[1]->type) != type_op))
     {
         sprintf(error_msg, "Des opérations sur des %s uniquement se font sur d'autres type !\n", node_type2string(type_op));
@@ -366,6 +390,7 @@ void test_op_type(node_t root, int type)
         exit(1);
         error_in_program = true;
     }
+
 
     if (root->nature == NODE_MOD || root->nature == NODE_DIV)
     {
@@ -380,6 +405,8 @@ void test_op_type(node_t root, int type)
             error_in_program = true;
         }
     }
+
+
     root->type = type_op;
 
     if (is_allocate == 1)
@@ -400,7 +427,7 @@ void test_op_type(node_t root, int type)
         pop_temporary_virtual();
         pop_temporary_virtual();
     }
-    
+
 }
 
 void test_op_cond(node_t root)
@@ -463,4 +490,26 @@ void test_op_cond(node_t root)
         pop_temporary_virtual();
         pop_temporary_virtual();
     }
+}
+
+void actions_uminus(node_t root)
+{
+    //printf("JE RENTRE DANS actions_uminus\n");
+    switch(root->opr[0]->nature)
+    {
+        case NODE_MUL :
+        case NODE_MINUS :
+        case NODE_BAND : 
+        case NODE_BOR : 
+        case NODE_BXOR :
+        case NODE_SLL :
+        case NODE_SRL :
+        case NODE_SRA :
+        case NODE_PLUS :
+        case NODE_MOD :    
+        case NODE_DIV :
+            passe_1(root->opr[0]);
+            break;
+    }
+    //printf("JE SORS DE actions_uminus\n");
 }

@@ -186,7 +186,7 @@ int32_t action_op(node_t root)
 {
     printf("Je rentre dans action OP avec le noeud : %s\n", node_nature2string(root->nature));
     printf("FILS 1 : %s\n", node_nature2string(root->opr[0]->nature));
-    printf("FILS 2 : %s\n", node_nature2string(root->opr[1]->nature));
+    //printf("FILS 2 : %s\n", node_nature2string(root->opr[1]->nature));
     int32_t registre_courant_op1;
     int32_t registre_courant_op2;
     int32_t res_reg;
@@ -287,14 +287,14 @@ int32_t action_op(node_t root)
 
     else if (root->opr[0]->nature == NODE_INTVAL || root->opr[0]->nature == NODE_BOOLVAL)
     {
-        if (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL)
+        if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
         {
             printf("MES DEUX FILS SONT DES LITERRAUX \n\n");
             create_ori_inst(8, 0, root->opr[0]->value);
             gen_ope_i_code(root, res_reg, 8, (int32_t)root->opr[1]->value);
 
         }
-        else if (root->opr[1]->nature == NODE_IDENT)
+        else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
         {
             printf("UN FILS LITTERAL ET UN IDENT\n");
             load_ident(root->opr[1], 8);
@@ -308,7 +308,7 @@ int32_t action_op(node_t root)
     }
     else if (root->opr[0]->nature == NODE_IDENT)
     {
-        if (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL)
+        if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
         {
             printf("UN FILS IDENT ET UN LITTERAL\n");
 
@@ -322,7 +322,7 @@ int32_t action_op(node_t root)
                 gen_ope_i_code(root, res_reg, -1, root->opr[1]->value);
             }
         }
-        else if (root->opr[1]->nature == NODE_IDENT)
+        else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
         {
             printf("DEUX FILS IDENT\n");
             load_ident(root->opr[0], 8);
@@ -583,8 +583,8 @@ void load_ident(node_t root, int32_t dest)
 {
     printf("JE RENTRE DANS LOAD_IDENT  !! \n\n\n"); 
     if(root->decl_node->global_decl){
-            create_lui_inst(8, data_start);
-            create_lw_inst(dest, root->decl_node->offset, 8);
+            create_lui_inst(dest, data_start);
+            create_lw_inst(dest, root->decl_node->offset, dest);
     }
     else {
         printf("nature de root %s \n\n", node_nature2string(root->nature));
@@ -735,6 +735,7 @@ void action_print(node_t root)
         {
             case NODE_STRINGVAL :
                 create_lui_inst(4, data_start);
+                printf("offset de la string : %d\n", root->opr[i]->offset);
                 create_ori_inst(4, 4, root->opr[i]->offset);
                 create_ori_inst(2, 0, 4);
                 create_syscall_inst();

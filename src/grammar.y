@@ -312,7 +312,6 @@ expr:
         | 
         TOK_MINUS expr %prec TOK_UMINUS
         {
-            //a voir nous ne sommes pas sur
             $$ = make_node(NODE_UMINUS, 1, $2);
         }
         | 
@@ -505,20 +504,20 @@ node_t make_node(node_nature nature, int nops, ...) {
         
         case NODE_INTVAL :
             //res->opr = malloc(sizeof(node_t)*nops);
-            res->type = TYPE_NONE;
+            res->type = TYPE_INT;
             res->value = yylval.intval;
             break;
         
         case NODE_STRINGVAL :
             //res->opr = malloc(sizeof(node_t)*(nops-1));
-            res->type = TYPE_NONE;
-            res->str = malloc(sizeof(char)*strlen(yylval.strval));
+            res->type = TYPE_STRING;
+            res->str = malloc(sizeof(char)*(strlen(yylval.strval)));
             res->str = yylval.strval;
             break;
 
         case NODE_BOOLVAL :
             //res->opr = malloc(sizeof(node_t)*(nops-1));
-            res->type = TYPE_NONE;
+            res->type = TYPE_BOOL;
             if(va_arg(ap, char *) == "true")
                 res->value = 1;
             else

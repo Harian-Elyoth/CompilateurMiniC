@@ -24,6 +24,7 @@ void passe_1(node_t root);
 void test_boucle(node_t root);
 void actions_node_ident(node_t root);
 void actions_node_decl(node_t root);
+void actions_uminus(node_t root);
 void test_op(node_t root);
 void test_op_type(node_t root, int type);
 void test_op_cond(node_t root);
