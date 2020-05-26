@@ -4,17 +4,16 @@ extern bool print_warning;
 extern int32_t global_strings_number;
 extern char ** global_string;
 extern int32_t stack_size_decl;
+extern int32_t var_globales_offset;
 
 bool flag_data = true;
+int nb_reg_push = 0;
 
 // le but de cette fonction est de générer un code assembleur sur le parcours de l'arbre.
 void passe_2(node_t root){
     set_max_registers(32);
     node_t node_actuel = root; 
     int32_t num_registre;
-
-    const char * nature = node_nature2string(root->nature); 
-    printf("node actuel : %s\n\n", nature);
 
     //TRAITEMENT EN DESCENDANT DANS L'ARBRE
 
@@ -61,11 +60,14 @@ void passe_2(node_t root){
         case NODE_DOWHILE :
             action_loop(node_actuel);
             break;
+        case NODE_PRINT :
+            action_print(node_actuel);
         default:
             break;
-
-
     }
+
+    const char * nature = node_nature2string(root->nature); 
+    printf("node actuel : %s\n\n", nature);
 
 	//APPELS RECURISF 
     switch(node_actuel->nature){
@@ -75,6 +77,7 @@ void passe_2(node_t root){
         case NODE_FOR :
         case NODE_IF :
         case NODE_DOWHILE :
+        case NODE_PRINT :
             break;
         default : 
             for (int i = 0; i < node_actuel->nops; ++i)
@@ -87,12 +90,11 @@ void passe_2(node_t root){
             break;
     }
 
-
 	//TRAITEMENT EN REMONTANT
-
 	switch(node_actuel->nature)
 	{
         case NODE_FUNC :
+            create_ori_inst(2, 0, 10);
             create_syscall_inst();
             break;
 	}
@@ -140,6 +142,8 @@ void action_decl(node_t root)
             case NODE_LE : 
             case NODE_GT : 
             case NODE_GE : 
+            case NODE_NOT :
+            case NODE_BNOT :
             case NODE_BAND : 
             case NODE_BOR : 
             case NODE_BXOR :
@@ -177,12 +181,27 @@ int32_t action_op(node_t root)
     int32_t registre_courant_op1;
     int32_t registre_courant_op2;
     int32_t res_reg;
+
+    if (reg_available())
+    {
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+    else
+    {
+        nb_reg_push++;
+        push_temporary(get_current_reg());
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+
     int son_operator_flag = -1; 
     /*
     0 : Il n'a pas de fils opérateur
     1 : Son fils operateur est le premier fils (opr[0])
     2 : Sin fils operateur est le deuxieme fils (opr[1])
     */
+
     for(int i = 0 ; i < root->nops ; i++){
         switch(root->opr[i]->nature){
             case NODE_MUL :
@@ -191,6 +210,8 @@ int32_t action_op(node_t root)
             case NODE_LE : 
             case NODE_GT : 
             case NODE_GE : 
+            case NODE_NOT :
+            case NODE_BNOT :
             case NODE_BAND : 
             case NODE_BOR : 
             case NODE_BXOR :
@@ -217,8 +238,8 @@ int32_t action_op(node_t root)
                     registre_courant_op2 = action_op(root->opr[i]);
                     release_reg();
                 }
-                
                 break;
+
             default :
                 break;
                 
@@ -229,30 +250,19 @@ int32_t action_op(node_t root)
     printf("Son operator flag vaut : %d\n\n\n", son_operator_flag);
     if(son_operator_flag >= 0){
         if(son_operator_flag == 0){
-            if(root->opr[1]->nature == NODE_IDENT){
-                if(reg_available()){
-                    allocate_reg();
-                    res_reg = get_current_reg();
-                    gen_ope_r_code(root, res_reg, res_reg, registre_courant_op1);
-                }
+            if(root->opr[1]->nature == NODE_IDENT)
+            {
+                load_ident(root->opr[1], 8);
+                gen_ope_r_code(root, res_reg, 8, registre_courant_op1);
             }
             else if(root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL)
             {
-                if(reg_available()){
-                    allocate_reg();
-                    res_reg = get_current_reg();
-                    gen_ope_i_code(root, res_reg, registre_courant_op1, root->opr[1]->value);
-                }
-                    
+                gen_ope_i_code(root, res_reg, registre_courant_op1, root->opr[1]->value);                    
             }
         }
-        else if(son_operator_flag == 1){
-
-            if(reg_available()){
-                allocate_reg();
-                res_reg = get_current_reg();
-                gen_ope_r_code(root, res_reg, registre_courant_op1, registre_courant_op2);
-            }
+        else if(son_operator_flag == 1)
+        {
+            gen_ope_r_code(root, res_reg, registre_courant_op1, registre_courant_op2);
         }
     }
 
@@ -261,36 +271,20 @@ int32_t action_op(node_t root)
         if (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL)
         {
             printf("MES DEUX FILS SONT DES LITERRAUX \n\n");
-            if (reg_available())
-            {
-                allocate_reg();
-                res_reg = get_current_reg();
-                if (reg_available())
-                {
-                        allocate_reg();
-                        int32_t source1_reg = get_current_reg();
-                        create_ori_inst(source1_reg, 0, root->opr[0]->value);
-                        gen_ope_i_code(root, res_reg, source1_reg, (int32_t)root->opr[1]->value);
-                        release_reg();
-                }
-            }
+            create_ori_inst(8, 0, root->opr[0]->value);
+            gen_ope_i_code(root, res_reg, 8, (int32_t)root->opr[1]->value);
+
         }
         else if (root->opr[1]->nature == NODE_IDENT)
         {
             printf("UN FILS LITTERAL ET UN IDENT\n");
-            if (reg_available())
-            {
-                allocate_reg();
-                res_reg = get_current_reg();
-                if (reg_available())
-                {
-                        allocate_reg();
-                        int32_t source1_reg = get_current_reg();
-                        load_ident(root->opr[1], source1_reg);
-                        gen_ope_i_code(root, res_reg, source1_reg, root->opr[0]->value);
-                        release_reg();
-                }
-            }
+            load_ident(root->opr[1], 8);
+            gen_ope_i_code(root, res_reg, 8, root->opr[0]->value);
+        }
+        //op unaire
+        else
+        {
+            gen_ope_i_code(root, res_reg, res_reg, root->opr[0]->value);
         }
     }
     else if (root->opr[0]->nature == NODE_IDENT)
@@ -298,54 +292,38 @@ int32_t action_op(node_t root)
         if (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL)
         {
             printf("UN FILS IDENT ET UN LITTERAL\n");
-            if (reg_available())
+
+            if(root->nature != NODE_AFFECT)
             {
-                allocate_reg();
-                res_reg = get_current_reg();
-                if(root->nature != NODE_AFFECT)
-                {
-                    if (reg_available())
-                    {
-                        allocate_reg();
-                        int32_t source1_reg = get_current_reg();
-                        load_ident(root->opr[0], source1_reg);
-                        gen_ope_i_code(root, res_reg, source1_reg, root->opr[1]->value);
-                        release_reg();
-                    }
-                }
-                else
-                {
-                    gen_ope_i_code(root, res_reg, -1, root->opr[1]->value);
-                }
+                load_ident(root->opr[0], 8);
+                gen_ope_i_code(root, res_reg, 8, root->opr[1]->value);
+            }
+            else
+            {
+                gen_ope_i_code(root, res_reg, -1, root->opr[1]->value);
             }
         }
         else if (root->opr[1]->nature == NODE_IDENT)
         {
             printf("DEUX FILS IDENT\n");
-            if (reg_available())
+
+            load_ident(root->opr[0], 8);
+            if(reg_available)
             {
                 allocate_reg();
-                res_reg = get_current_reg();
-                
-                if (reg_available())
-                {
-                    allocate_reg();
-                    int32_t source1_reg = get_current_reg();
-                    load_ident(root->opr[0], source1_reg);
-                    if(reg_available){
-                        allocate_reg();
-                        int32_t source2_reg = get_current_reg();
-                        load_ident(root->opr[1], source2_reg);
-                        gen_ope_r_code(root, res_reg, source1_reg, source2_reg);
-                        release_reg();
-                        
-                    }               
-                    release_reg();
-                }
+                int32_t source2_reg = get_current_reg();
+                load_ident(root->opr[1], source2_reg);
+                gen_ope_r_code(root, res_reg, 8, source2_reg);
+                release_reg();
             }
         }
+        //op unaire
+        else
+        {
+            load_ident(root->opr[0], 8);
+            gen_ope_r_code(root,res_reg,8,0);
+        }
     }
-
     return res_reg;
 }
 
@@ -367,72 +345,55 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 break;
             case NODE_LT : 
                 create_sltu_inst(r_dest, r_source, r_source2);
-                if(reg_available()){
-                    allocate_reg();
-                    new_reg = get_current_reg();
-                    new_label_nb = get_new_label();
-                    new_label_nb_2 = get_new_label();
-                    create_ori_inst(new_reg, 0, 0);
-                    create_bne_inst(r_dest, new_reg, new_label_nb);
-                    create_j_inst(new_label_nb_2);
-                    create_label_inst(new_label_nb);
-                    create_ori_inst(r_dest, 0, 1);
-                    create_label_inst(new_label_nb_2);
-                    release_reg();
-                    
-                }
+                new_label_nb = get_new_label();
+                new_label_nb_2 = get_new_label();
+                create_bne_inst(r_dest, 0, new_label_nb);
+                create_j_inst(new_label_nb_2);
+                create_label_inst(new_label_nb);
+                create_ori_inst(r_dest, 0, 1);
+                create_label_inst(new_label_nb_2);
                 break;
             case NODE_LE : 
                 create_sltu_inst(r_dest, r_source2, r_source);
-                if(reg_available()){
-                    allocate_reg();
-                    new_reg = get_current_reg();
-                    new_label_nb = get_new_label();
-                    new_label_nb_2 = get_new_label();
-                    create_ori_inst(new_reg, 0, 0);
-                    create_bne_inst(r_dest, new_reg, new_label_nb);
-                    create_j_inst(new_label_nb_2);
-                    create_label_inst(new_label_nb);
-                
-                    create_ori_inst(r_dest, 0, 0);
 
-                    create_label_inst(new_label_nb_2);
-                    release_reg();
-                }
+                new_label_nb = get_new_label();
+                new_label_nb_2 = get_new_label();
+                create_bne_inst(r_dest, 0, new_label_nb);
+                create_j_inst(new_label_nb_2);
+                create_label_inst(new_label_nb);
+                create_ori_inst(r_dest, 0, 0);
+                create_label_inst(new_label_nb_2);
+
                 break;
             case NODE_GT : 
                 create_sltu_inst(r_dest, r_source2, r_source);
-                if(reg_available()){
-                    allocate_reg();
-                    new_reg = get_current_reg();
-                    new_label_nb = get_new_label();
-                    new_label_nb_2 = get_new_label();
-                    create_ori_inst(new_reg, 0, 0);
-                    create_bne_inst(r_dest, new_reg, new_label_nb);
-                    create_j_inst(new_label_nb_2);
-                    create_label_inst(new_label_nb);
-                    create_ori_inst(r_dest, 0, 1);
-                    create_label_inst(new_label_nb_2);
-                    release_reg();
-                }
+                new_label_nb = get_new_label();
+                new_label_nb_2 = get_new_label();
+                create_bne_inst(r_dest, 0, new_label_nb);
+                create_j_inst(new_label_nb_2);
+                create_label_inst(new_label_nb);
+                create_ori_inst(r_dest, 0, 1);
+                create_label_inst(new_label_nb_2);
                 break;
+
             case NODE_GE : 
                 create_sltu_inst(r_dest, r_source, r_source2);
-                if(reg_available()){
-                    allocate_reg();
-                    new_reg = get_current_reg();
-                    new_label_nb = get_new_label();
-                    new_label_nb_2 = get_new_label();
-                    create_ori_inst(new_reg, 0, 0);
-                    create_bne_inst(r_dest, new_reg, new_label_nb);
-                    create_j_inst(new_label_nb_2);
-                    create_label_inst(new_label_nb);
-                
-                    create_ori_inst(r_dest, 0, 0);
 
-                    create_label_inst(new_label_nb_2);
-                    release_reg();
-                }
+                new_label_nb = get_new_label();
+                new_label_nb_2 = get_new_label();
+
+                create_bne_inst(r_dest, 0, new_label_nb);
+                create_j_inst(new_label_nb_2);
+                create_label_inst(new_label_nb);
+            
+                create_ori_inst(r_dest, 0, 0);
+
+                create_label_inst(new_label_nb_2);
+                break;
+
+            case NODE_NOT :
+            case NODE_BNOT :
+                create_nor_inst(r_dest, 0, r_source);
                 break;
             case NODE_BAND : 
                 create_and_inst(r_dest, r_source, r_source2);
@@ -511,35 +472,25 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
 
         case NODE_LT : 
             create_sltiu_inst(dest, source, imm);
-            if(reg_available()){
-                allocate_reg();
-                new_reg = get_current_reg();
-                new_label_nb = get_new_label();
-                new_label_nb_2 = get_new_label();
-                create_ori_inst(new_reg, 0, 0);
-                create_bne_inst(dest, new_reg, new_label_nb);
-                create_j_inst(new_label_nb_2);
-                create_label_inst(new_label_nb);
-                create_ori_inst(dest, 0, 1);
-                create_label_inst(new_label_nb_2);
-                release_reg();
-            }
+
+            new_label_nb = get_new_label();
+            new_label_nb_2 = get_new_label();
+            create_bne_inst(dest, 0, new_label_nb);
+            create_j_inst(new_label_nb_2);
+            create_label_inst(new_label_nb);
+            create_ori_inst(dest, 0, 1);
+            create_label_inst(new_label_nb_2);
             break;
+
         case NODE_GE : 
-        create_sltiu_inst(dest, source, imm);
-            if(reg_available()){
-                allocate_reg();
-                new_reg = get_current_reg();
-                new_label_nb = get_new_label();
-                new_label_nb_2 = get_new_label();
-                create_ori_inst(new_reg, 0, 0);
-                create_bne_inst(dest, new_reg, new_label_nb);
-                create_j_inst(new_label_nb_2);
-                create_label_inst(new_label_nb);
-                create_ori_inst(dest, 0, 0);
-                create_label_inst(new_label_nb_2);
-                release_reg();
-            }
+            create_sltiu_inst(dest, source, imm);
+            new_label_nb = get_new_label();
+            new_label_nb_2 = get_new_label();
+            create_bne_inst(dest, 0, new_label_nb);
+            create_j_inst(new_label_nb_2);
+            create_label_inst(new_label_nb);
+            create_ori_inst(dest, 0, 0);
+            create_label_inst(new_label_nb_2);
             break;
 
         case NODE_BXOR :
@@ -559,6 +510,8 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
         case NODE_SLL :
         case NODE_SRL :
         case NODE_SRA :
+        case NODE_NOT :
+        case NODE_BNOT :
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_MOD :    
@@ -567,15 +520,16 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
         case NODE_LE :
         case NODE_MUL :
         case NODE_MINUS :
-            if(reg_available){
+            if(reg_available)
+            {
                 allocate_reg();
                 new_reg = get_current_reg();
                 create_ori_inst(new_reg, 0, imm);
                 gen_ope_r_code(node, dest, source, new_reg);
                 release_reg();
             }
-            
             break;
+
         case NODE_AFFECT :
             create_ori_inst(dest, 0, imm);
             //create_addiu_inst(dest, source, imm);
@@ -586,7 +540,8 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
     }
 }
 
-void load_ident(node_t root, int32_t dest){
+void load_ident(node_t root, int32_t dest)
+{
     printf("JE RENTRE DANS LOAD_IDENT  !! \n\n\n"); 
     if(root->decl_node->global_decl){
             create_lui_inst(8, data_start);
@@ -600,13 +555,15 @@ void load_ident(node_t root, int32_t dest){
     }
 }
 
-void store_ident(node_t root, int32_t source, bool is_decl){
+void store_ident(node_t root, int32_t source, bool is_decl)
+{
     printf("JE RENTRE DANS STORE IDENT\n");
     if (is_decl)
     {
-        if(root->global_decl){
-        create_lui_inst(8, data_start);
-        create_sw_inst(source, root->offset, 8);
+        if(root->global_decl)
+        {
+            create_lui_inst(8, data_start);
+            create_sw_inst(source, root->offset, 8);
         }
         else {
             create_sw_inst(source, root->offset, stack_reg);
@@ -614,9 +571,10 @@ void store_ident(node_t root, int32_t source, bool is_decl){
     }
     else
     {
-        if(root->decl_node->global_decl){
-        create_lui_inst(8, data_start);
-        create_sw_inst(source, root->decl_node->offset, 8);
+        if(root->decl_node->global_decl)
+        {
+            create_lui_inst(8, data_start);
+            create_sw_inst(source, root->decl_node->offset, 8);
         }
         else {
             create_sw_inst(source, root->decl_node->offset, stack_reg);
@@ -658,25 +616,22 @@ void action_loop(node_t root)
                 break;
 
             case NODE_BLOCK :
+
+                if (reg_available())
+                {
+                    allocate_reg();
+                    true_register = get_current_reg();
+                }
                 if (root->nature == NODE_IF)
                 {
-                    if (reg_available())
-                    {
-                        allocate_reg();
-                        true_register = get_current_reg();
-                        create_ori_inst(true_register, 0, 1);
-                        create_beq_inst(num_registre, true_register, label_suite);
-                        passe_2(root->opr[i]);
-                        create_label_inst(label_suite);
-                        release_reg();
-                    }
+                    create_ori_inst(true_register, 0, 1);
+                    create_beq_inst(num_registre, true_register, label_suite);
+                    passe_2(root->opr[i]);
+                    create_label_inst(label_suite);
+                    release_reg();
                 }
                 else if (root->nature == NODE_WHILE)
                 {
-                    if (reg_available())
-                    {
-                        allocate_reg();
-                        true_register = get_current_reg();
                         create_ori_inst(true_register, 0, 1);
                         create_label_inst(label_loop);
                         create_beq_inst(num_registre, true_register, label_suite);
@@ -684,43 +639,62 @@ void action_loop(node_t root)
                         create_j_inst(label_loop);
                         create_label_inst(label_suite);
                         release_reg();
-                    }
+
                 }
                 else if (root->nature == NODE_FOR)
                 {
-                    if (reg_available())
-                    {
-                        allocate_reg();
-                        true_register = get_current_reg();
-                        create_ori_inst(true_register, 0, 1);
-                        create_label_inst(label_loop);
-                        create_beq_inst(num_registre, true_register, label_suite);
-                        passe_2(root->opr[i]);
-                        num_registre = action_op(root->opr[2]);
-                        create_j_inst(label_loop);
-                        create_label_inst(label_suite);
-                        release_reg();
-                    }
+                    create_ori_inst(true_register, 0, 1);
+                    create_label_inst(label_loop);
+                    create_beq_inst(num_registre, true_register, label_suite);
+                    passe_2(root->opr[i]);
+                    num_registre = action_op(root->opr[2]);
+                    create_j_inst(label_loop);
+                    create_label_inst(label_suite);
+                    release_reg();
                 }
                 else if (root->nature == NODE_DOWHILE)
                 {
-                    if (reg_available())
-                    {
-                        create_label_inst(label_loop);
-                        passe_2(root->opr[i]);
 
-                        allocate_reg();
-                        true_register = get_current_reg();
-                        create_ori_inst(true_register, 0, 1);
-                        num_registre = action_op(root->opr[1]);
-
-                        create_bne_inst(num_registre, true_register, label_loop);
-                    
-                        release_reg();
-                    }
+                    create_label_inst(label_loop);
+                    passe_2(root->opr[i]);
+                    create_ori_inst(true_register, 0, 1);
+                    num_registre = action_op(root->opr[1]);
+                    create_bne_inst(num_registre, true_register, label_loop);
+                    release_reg();
                 }
                 release_reg();
                 break;
         } 
+    }
+}
+
+void action_print(node_t root)
+{   
+    //printf("JE RENTRE DANS ACTION PRINT\n");
+    //printf("AVCE LE NOEUD ACTUEL : %s\n\n\n", node_nature2string(root->nature));
+
+    for (int i = 0; i < root->nops; ++i)
+    {
+        switch(root->opr[i]->nature)
+        {
+            case NODE_STRINGVAL :
+                create_lui_inst(8, data_start);
+                create_lw_inst(4, root->opr[i]->offset, 8);
+                create_ori_inst(2, 0, 4);
+                create_syscall_inst();
+                break;
+
+            case NODE_LIST :
+                action_print(root->opr[i]);
+                break;
+
+            case NODE_IDENT :
+                load_ident(root->opr[i], 4);
+                create_ori_inst(2, 0, 1);
+                create_syscall_inst();
+                break;
+            default :
+                break;
+        }
     }
 }

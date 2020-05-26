@@ -27,4 +27,5 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm);
 void load_ident(node_t node, int32_t dest);
 void store_ident(node_t node, int32_t source, bool is_decl);
 void action_loop(node_t root);
+void action_print(node_t root);
 #endif

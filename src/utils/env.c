@@ -91,7 +91,6 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 
 	if (node_actuel->opr[1] == NULL)
 	{
-		printf("je rentre ici\n");
 		if (flag_global)
 		{
 			int intval_global = 0;
@@ -111,19 +110,14 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 		printf("valeur de %s = %d\n",ident,(*((int*)node_value)));
 	}
 
-	if (env_actuel->context == NULL)
-	{
-		printf("ERROR\n");
-	}
-
 	bool ret = context_add_element(env_actuel->context, (node_t)(node_actuel->opr[0]), ident, node_value);
 
-
-	if(ret == false){
-		printf("une variable du meme nom existe deja\n");
+	if(ret == false)
+	{
 		return -1;
 	}
-	else {
+	else 
+	{
 		int offset_ret = global_offset - env_actuel->env_offset;
 		global_offset += size;
 		return offset_ret;
@@ -168,9 +162,23 @@ int32_t add_string(char * str)
 {
 	// Ajoute la déclaration en section .data d’une chaine de
 	// caractère littérale et retourne l’offset correspondant.
+	char ** tab_str = realloc(global_string, sizeof(char*));
+	
+    if(tab_str == NULL)
+    {
+        printf("ERROR ALLOCATION MEMOIRE ADD STRING\n");
+        exit(1);
+    }
+    else
+    {
+        global_string = tab_str;
+    }
+
+    global_string[global_strings_number] = str;
 
 	int32_t res = var_globales_offset;
 	var_globales_offset += strlen(str);
+
 	return res;
 		
 }
@@ -212,4 +220,6 @@ void free_global_strings()
 	// La valeur de retour des fonctions env_add_element() et add_string() 
 	// devrait être stockée dans le champ offset des noeuds adéquats.
 	free(global_string);
+	//boucles sur le tableau global_string pour libérer chaque chaine
+	//Puis liberer le tableau
 }

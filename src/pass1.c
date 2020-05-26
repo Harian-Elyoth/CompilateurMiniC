@@ -67,21 +67,8 @@ void passe_1(node_t root){
 
         case NODE_STRINGVAL : 
         {
-            
-            char ** tab_str = realloc(global_string, sizeof(char*));
-            if(tab_str == NULL)
-            {
-                printf("ERROR ALLOCATION MEMOIRE\n");
-                exit(1);
-            }
-            else
-            {
-                global_string = tab_str;
-            }
-            printf("mon string vaut : %s\n",root->str);
-            global_string[global_strings_number] = root->str;
-            root->type = TYPE_STRING;
             root->offset = add_string(root->str);
+            root->type = TYPE_STRING;
             global_strings_number++;
             break;
         }
@@ -175,7 +162,6 @@ void passe_1(node_t root){
         case NODE_BLOCK :
         {
             pop_context();
-            pop_temporary_virtual();
             break;
         }
         default:
@@ -288,11 +274,6 @@ void actions_node_decl(node_t root)
 
 void test_op(node_t root)
 {
-    if (!(reg_available()))
-    {
-        push_temporary_virtual();
-    }
-
     switch(root->nature)
     {
         case NODE_MUL :
@@ -333,8 +314,33 @@ void test_op(node_t root)
 
 void test_op_type(node_t root, int type)
 {
+    int is_allocate = 0;
+    int is_push = 0;
+
+    if (reg_available())
+    {
+        allocate_reg();
+        is_allocate = 1;
+        if (reg_available())
+        {
+            allocate_reg();
+            is_allocate = 2;
+        }
+        else
+        {
+            push_temporary_virtual();
+            is_push = 1;
+        }
+    }
+    else
+    {
+        is_push = 2;
+        push_temporary_virtual();
+    }
+
     char error_msg[100];
     node_type type_op = TYPE_NONE;
+
     if (type == 0)
     {
         type_op = TYPE_INT;
@@ -371,10 +377,55 @@ void test_op_type(node_t root, int type)
         }
     }
     root->type = type_op;
+
+    if (is_allocate == 1)
+    {
+        release_reg();
+    }
+    else if (is_allocate == 2)
+    {
+        release_reg();
+        release_reg();
+    }
+    if (is_push == 1)
+    {
+        pop_temporary_virtual();
+    }
+    else if (is_push == 2)
+    {
+        pop_temporary_virtual();
+        pop_temporary_virtual();
+    }
+    
 }
 
 void test_op_cond(node_t root)
 {
+
+    int is_allocate = 0;
+    int is_push = 0;
+
+    if (reg_available())
+    {
+        allocate_reg();
+        is_allocate = 1;
+        if (reg_available())
+        {
+            allocate_reg();
+            is_allocate = 2;
+        }
+        else
+        {
+            push_temporary_virtual();
+            is_push = 1;
+        }
+    }
+    else
+    {
+        is_push = 2;
+        push_temporary_virtual();
+    }
+
     char error_msg[100];
 
     for (int i = 0; i < root->nops; ++i)
@@ -389,5 +440,23 @@ void test_op_cond(node_t root)
         error_in_program = true;
     }
     root->type = TYPE_BOOL;
-
+    
+    if (is_allocate == 1)
+    {
+        release_reg();
+    }
+    else if (is_allocate == 2)
+    {
+        release_reg();
+        release_reg();
+    }
+    if (is_push == 1)
+    {
+        pop_temporary_virtual();
+    }
+    else if (is_push == 2)
+    {
+        pop_temporary_virtual();
+        pop_temporary_virtual();
+    }
 }

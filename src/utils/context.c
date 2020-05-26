@@ -206,7 +206,6 @@ bool context_add_element(context_t context, node_t node, char * idf, void * data
 				noeud_actuel->suite_idf[i] = NULL;
 			}
 			noeud_actuel->lettre = char_actuel[i];
-			noeud_actuel->idf_existant = false;
 
 			if(i == longueur_idf - 1){
 				noeud_actuel->data = malloc(sizeof(int));
