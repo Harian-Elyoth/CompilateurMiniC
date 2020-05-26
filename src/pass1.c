@@ -53,7 +53,6 @@ void passe_1(node_t root){
         case NODE_FUNC :
             reset_temporary_max_offset();
             flag_global = false;
-            //reset_env_current_offset();
             root->offset = global_offset;
             break;
 
@@ -164,6 +163,9 @@ void passe_1(node_t root){
             pop_context();
             break;
         }
+        case NODE_PROGRAM :
+            pop_context();
+            break;
         default:
             break;
     }
@@ -214,7 +216,7 @@ void test_boucle(node_t root)
 void actions_node_ident(node_t root)
 {
     char error_msg[100];
-
+    bool is_main = false;
     //printf("je suis dans NODE_IDENT\n");
     root->global_decl = flag_global; 
     root->type = type_actuel;
@@ -222,34 +224,36 @@ void actions_node_ident(node_t root)
     {
         //printf("je suis dans une utilisation\n");
 
-        if(!strcmp(root->ident, "main")){
-            if(root->type != TYPE_VOID){
+        if(strcmp(root->ident, "main") == 0)
+        {
+            is_main = true;
+        }
+        if (!(is_main))
+        {    
+            root->decl_node = (node_t)get_decl_node(root->ident);
+
+            if (root->decl_node == NULL)
+            {
+                root->type = TYPE_NONE;  
+                error_in_program = true;      
+                sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
+                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                exit(1);
+            }
+            else{root->type = (root->decl_node)->type;}
+        }
+        else
+        {
+            if(root->type != TYPE_VOID)
+            {
                 sprintf(error_msg, "le main n'est pas de type void !\n");
                 fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
                 exit(1);
                 error_in_program = true;
             }
         }
-        else
-        {    
-            root->decl_node = (node_t)get_decl_node(root->ident);
-        }
-        if (root->decl_node == NULL)
-        {
-            root->type = TYPE_NONE;
-            if (print_warning)
-            {                        
-                sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
-                exit(1);
-            }
-            error_in_program = true;
-        }
-        else
-        { root->type = (root->decl_node)->type; }
     }
-    else
-    { flag_decl = false; }
+    else{flag_decl = false;}
 }
 
 void actions_node_decl(node_t root)

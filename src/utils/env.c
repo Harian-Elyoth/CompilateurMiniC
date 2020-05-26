@@ -63,6 +63,7 @@ void push_context()
 
 void pop_context()
 {
+	printf("ON RENTRE DANS pop_context ! \n\n\n");
 	// A appeler à la fin de l’analyse d’un bloc déclarant des variables. 
 	// Cette fonction dépile et libère le contexte courant.
 	env_t above_env = env_actuel->next;
