@@ -7,7 +7,8 @@ extern int32_t stack_size_decl;
 extern int32_t var_globales_offset;
 
 bool flag_data = true;
-int nb_reg_push = 0;
+bool reg_push_op = false;
+bool reg_push_loop = false;
 
 // le but de cette fonction est de générer un code assembleur sur le parcours de l'arbre.
 void passe_2(node_t root){
@@ -51,7 +52,12 @@ void passe_2(node_t root){
             num_registre = action_op(node_actuel);
             printf("registre de store = %d\n", num_registre);
             store_ident(node_actuel->opr[0], num_registre, false);
-            release_reg();
+            if (reg_push_op)
+            {
+                pop_temporary(num_registre);
+                reg_push_op = false;
+            }
+            else{release_reg();}
             break;
 
         case NODE_WHILE :
@@ -160,7 +166,12 @@ void action_decl(node_t root)
             case NODE_AFFECT :
                 num_registre = action_op(root->opr[1]);
                 store_ident(root->opr[0], num_registre, true);
-                release_reg();
+                if (reg_push_op)
+                {
+                    pop_temporary(num_registre);
+                    reg_push_op = false;
+                }
+                else{release_reg();}
                 break;
             default:
                 break;
@@ -189,7 +200,7 @@ int32_t action_op(node_t root)
     }
     else
     {
-        nb_reg_push++;
+        reg_push_op = true;
         push_temporary(get_current_reg());
         allocate_reg();
         res_reg = get_current_reg();
@@ -230,13 +241,23 @@ int32_t action_op(node_t root)
                 {
                     son_operator_flag = i;
                     registre_courant_op1 = action_op(root->opr[i]);
-                    release_reg();
+                    if (reg_push_op)
+                    {
+                        pop_temporary(registre_courant_op1);
+                        reg_push_op = false;
+                    }
+                    else{release_reg();}
                 }
                 else
                 {
                     son_operator_flag = i;
                     registre_courant_op2 = action_op(root->opr[i]);
-                    release_reg();
+                    if (reg_push_op)
+                    {
+                        pop_temporary(registre_courant_op2);
+                        reg_push_op = false;
+                    }
+                    else{release_reg();}
                 }
                 break;
 
@@ -306,15 +327,23 @@ int32_t action_op(node_t root)
         else if (root->opr[1]->nature == NODE_IDENT)
         {
             printf("DEUX FILS IDENT\n");
-
             load_ident(root->opr[0], 8);
-            if(reg_available)
+            if (reg_available())
             {
                 allocate_reg();
                 int32_t source2_reg = get_current_reg();
                 load_ident(root->opr[1], source2_reg);
                 gen_ope_r_code(root, res_reg, 8, source2_reg);
                 release_reg();
+            }
+            else
+            {
+                push_temporary(get_current_reg());
+                allocate_reg();
+                int32_t source2_reg = get_current_reg();
+                load_ident(root->opr[1], source2_reg);
+                gen_ope_r_code(root, res_reg, 8, source2_reg);
+                pop_temporary(source2_reg);
             }
         }
         //op unaire
@@ -520,7 +549,7 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
         case NODE_LE :
         case NODE_MUL :
         case NODE_MINUS :
-            if(reg_available)
+            if (reg_available())
             {
                 allocate_reg();
                 new_reg = get_current_reg();
@@ -528,11 +557,19 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
                 gen_ope_r_code(node, dest, source, new_reg);
                 release_reg();
             }
+            else
+            {
+                push_temporary(get_current_reg());
+                allocate_reg();
+                new_reg = get_current_reg();
+                create_ori_inst(new_reg, 0, imm);
+                gen_ope_r_code(node, dest, source, new_reg);
+                pop_temporary(new_reg);
+            }
             break;
 
         case NODE_AFFECT :
             create_ori_inst(dest, 0, imm);
-            //create_addiu_inst(dest, source, imm);
             break;
 
         default:
@@ -622,23 +659,33 @@ void action_loop(node_t root)
                     allocate_reg();
                     true_register = get_current_reg();
                 }
+                else
+                {
+                    reg_push_loop = true;
+                    push_temporary(get_current_reg());
+                    allocate_reg();
+                    true_register = get_current_reg();
+                }
                 if (root->nature == NODE_IF)
                 {
                     create_ori_inst(true_register, 0, 1);
                     create_beq_inst(num_registre, true_register, label_suite);
                     passe_2(root->opr[i]);
                     create_label_inst(label_suite);
-                    release_reg();
+
+                    if (reg_push_loop){pop_temporary(true_register);}
+                    else{release_reg();}
                 }
                 else if (root->nature == NODE_WHILE)
                 {
-                        create_ori_inst(true_register, 0, 1);
-                        create_label_inst(label_loop);
-                        create_beq_inst(num_registre, true_register, label_suite);
-                        passe_2(root->opr[i]);
-                        create_j_inst(label_loop);
-                        create_label_inst(label_suite);
-                        release_reg();
+                    create_ori_inst(true_register, 0, 1);
+                    create_label_inst(label_loop);
+                    create_beq_inst(num_registre, true_register, label_suite);
+                    passe_2(root->opr[i]);
+                    create_j_inst(label_loop);
+                    create_label_inst(label_suite);
+                    if (reg_push_loop){pop_temporary(true_register);}
+                    else{release_reg();}
 
                 }
                 else if (root->nature == NODE_FOR)
@@ -650,7 +697,8 @@ void action_loop(node_t root)
                     num_registre = action_op(root->opr[2]);
                     create_j_inst(label_loop);
                     create_label_inst(label_suite);
-                    release_reg();
+                    if (reg_push_loop){pop_temporary(true_register);}
+                    else{release_reg();}
                 }
                 else if (root->nature == NODE_DOWHILE)
                 {
@@ -660,9 +708,15 @@ void action_loop(node_t root)
                     create_ori_inst(true_register, 0, 1);
                     num_registre = action_op(root->opr[1]);
                     create_bne_inst(num_registre, true_register, label_loop);
-                    release_reg();
+                    if (reg_push_loop){pop_temporary(true_register);}
+                    else{release_reg();}
                 }
-                release_reg();
+                if (reg_push_op)
+                {
+                    pop_temporary(num_registre);
+                    reg_push_op = false;
+                }
+                else{release_reg();}
                 break;
         } 
     }
