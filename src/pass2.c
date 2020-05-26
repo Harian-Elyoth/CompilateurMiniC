@@ -20,10 +20,8 @@ void passe_2(node_t root){
     switch(node_actuel->nature){
         
         case NODE_PROGRAM :
-        	if (node_actuel->opr[0] != NULL)
-        	{
-        		create_data_sec_inst();
-        	}
+
+        	create_data_sec_inst();
         	break;
 
         case NODE_FUNC :
@@ -348,6 +346,7 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 new_label_nb = get_new_label();
                 new_label_nb_2 = get_new_label();
                 create_bne_inst(r_dest, 0, new_label_nb);
+                create_ori_inst(r_dest, 0, 0);
                 create_j_inst(new_label_nb_2);
                 create_label_inst(new_label_nb);
                 create_ori_inst(r_dest, 0, 1);
@@ -359,6 +358,7 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 new_label_nb = get_new_label();
                 new_label_nb_2 = get_new_label();
                 create_bne_inst(r_dest, 0, new_label_nb);
+                create_ori_inst(r_dest, 0, 1);
                 create_j_inst(new_label_nb_2);
                 create_label_inst(new_label_nb);
                 create_ori_inst(r_dest, 0, 0);
@@ -370,6 +370,7 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 new_label_nb = get_new_label();
                 new_label_nb_2 = get_new_label();
                 create_bne_inst(r_dest, 0, new_label_nb);
+                create_ori_inst(r_dest, 0, 0);
                 create_j_inst(new_label_nb_2);
                 create_label_inst(new_label_nb);
                 create_ori_inst(r_dest, 0, 1);
@@ -383,6 +384,7 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 new_label_nb_2 = get_new_label();
 
                 create_bne_inst(r_dest, 0, new_label_nb);
+                create_ori_inst(r_dest, 0, 1);
                 create_j_inst(new_label_nb_2);
                 create_label_inst(new_label_nb);
             
@@ -630,7 +632,7 @@ void action_loop(node_t root)
                     create_label_inst(label_suite);
                     release_reg();
                 }
-                else if (root->nature == NODE_WHILE)
+                else if (root->nature == NODE_WHILE) 
                 {
                         create_ori_inst(true_register, 0, 1);
                         create_label_inst(label_loop);
@@ -678,8 +680,8 @@ void action_print(node_t root)
         switch(root->opr[i]->nature)
         {
             case NODE_STRINGVAL :
-                create_lui_inst(8, data_start);
-                create_lw_inst(4, root->opr[i]->offset, 8);
+                create_lui_inst(4, data_start);
+                create_ori_inst(4, 4, root->opr[i]->offset);
                 create_ori_inst(2, 0, 4);
                 create_syscall_inst();
                 break;
