@@ -15,9 +15,6 @@
 #include "common.h"
 #include "mips_inst.h"
 
-/* Global variables */
-/* A completer */
-
 extern bool stop_after_syntax;
 extern bool stop_after_verif;
 extern char * infile;
@@ -537,12 +534,14 @@ node_t make_node(node_nature nature, int nops, ...) {
 }
 
 
-
-/* A completer */
-void analyse_tree(node_t root) {
-    if (!stop_after_syntax) {
+void analyse_tree(node_t root) 
+{
+    if (!stop_after_syntax) 
+    {
         passe_1(root);
-        if (!stop_after_verif) {
+
+        if (!stop_after_verif) 
+        {
             create_program(); 
             passe_2(root);
             dump_mips_program(outfile);
