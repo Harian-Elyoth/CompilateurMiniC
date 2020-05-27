@@ -63,14 +63,13 @@ void push_context()
 
 void pop_context()
 {
-	printf("ON RENTRE DANS pop_context ! \n\n\n");
+	//printf("ON RENTRE DANS pop_context ! \n\n\n");
 	// A appeler à la fin de l’analyse d’un bloc déclarant des variables. 
 	// Cette fonction dépile et libère le contexte courant.
 	env_t above_env = env_actuel->next;
 	free_context(env_actuel->context);
 	free(env_actuel);
 	env_actuel = above_env;
-	printf("on sort de pop_context\n");
 
 }
 
@@ -100,13 +99,15 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 		}
 		else
 		{
-			int intval_global = -1;
+			node_actuel->opr[0]->is_ini = false;
+			int intval_global = rand();
 			int * intval_global_pt = &intval_global;
 			node_value = (void *)(intval_global_pt);
 		}
 	}
 	else
 	{
+		node_actuel->opr[0]->is_ini = true;
 		if (node_actuel->opr[1]->nature == NODE_UMINUS)
 		{
 			node_t nd = (node_t)(node_actuel->opr[1]->opr[0]);
@@ -117,7 +118,7 @@ int32_t env_add_element(char * ident, void * node, int32_t size)
 		{
 			node_value = (int *)(&((node_t)(node_actuel->opr[1]))->value);
 		}
-		printf("valeur de %s = %d\n",ident,(*((int*)node_value)));
+		//printf("valeur de %s = %d\n",ident,(*((int*)node_value)));
 	}
 
 	bool ret = context_add_element(env_actuel->context, (node_t)(node_actuel->opr[0]), ident, node_value);
@@ -176,7 +177,7 @@ int32_t add_string(char * str)
 	
     if(tab_str == NULL)
     {
-        printf("ERROR ALLOCATION MEMOIRE ADD STRING\n");
+        fprintf(stderr, "ALLOCATION MEMOIRE ADD STRING\n");
         exit(1);
     }
     else

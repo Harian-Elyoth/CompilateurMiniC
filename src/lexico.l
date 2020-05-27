@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "common.h"
 #include "context.h"
+#include <time.h>
 
 #include "y.tab.h"
 
@@ -176,6 +177,7 @@ int yywrap(void) {
 
 int main(int argc, char ** argv) 
 {
+    srand(time(NULL));
 
     node_t program_root;
 
@@ -192,6 +194,9 @@ int main(int argc, char ** argv)
 
     analyse_tree(program_root);
     dump_tree(program_root, "apres_verif.dot");
+
+    if(trace_level == 4){printf("\nGénération du Code Assembleur terminé avec succés !\n\n");}
+
     yylex_destroy();
     return 0;
 }

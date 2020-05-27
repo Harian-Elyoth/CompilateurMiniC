@@ -5,6 +5,8 @@ extern int32_t global_strings_number;
 extern char ** global_string;
 extern int32_t stack_size_decl;
 extern int32_t var_globales_offset;
+extern int nb_reg;
+extern int trace_level;
 
 bool flag_data = true;
 bool reg_push_op = false;
@@ -14,7 +16,14 @@ bool reg_push_plus_minus = false;
 
 // le but de cette fonction est de générer un code assembleur sur le parcours de l'arbre.
 void passe_2(node_t root){
-    set_max_registers(32);
+
+    if (trace_level >= 3)
+    {
+        printf("Je rentre dans passe 2\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
+    set_max_registers(nb_reg);
     node_t node_actuel = root; 
     int32_t num_registre;
 
@@ -32,9 +41,7 @@ void passe_2(node_t root){
 
 			for (int i = 0; i < global_strings_number; ++i)
 			{	
-				char * label = malloc(sizeof(char)*10);
-				sprintf(label,"_ch%d",i);
-				create_asciiz_inst(label, global_string[i]);
+				create_asciiz_inst(NULL, global_string[i]);
 			}
 
 			create_text_sec_inst();
@@ -50,7 +57,6 @@ void passe_2(node_t root){
 
         case NODE_AFFECT :
             num_registre = action_op(node_actuel);
-            printf("registre de store = %d\n", num_registre);
             store_ident(node_actuel->opr[0], num_registre, false);
             if (reg_push_op)
             {
@@ -74,15 +80,9 @@ void passe_2(node_t root){
         case NODE_PRINT :
             action_print(node_actuel);
 
-        // case NODE_UMINUS :
-        //     num_registre = action_uminus(node_actuel);
-        //     break;
         default:
             break;
     }
-
-    const char * nature = node_nature2string(root->nature); 
-    printf("node actuel : %s\n\n", nature);
 
 	//APPELS RECURISF 
     switch(node_actuel->nature){
@@ -119,7 +119,12 @@ void passe_2(node_t root){
 
 void action_decl(node_t root)
 {
-    printf("JE RENTRE DANS ACTION DECL\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans action_decl\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     int32_t num_registre;
 
     if (flag_data)
@@ -161,7 +166,6 @@ void action_decl(node_t root)
             case NODE_UMINUS :
 
                 num_registre = action_uminus(root->opr[1]);
-                printf("num_registre = %d\n",num_registre);
                 store_ident(root->opr[0], num_registre, true);
 
                 if (reg_push_op)
@@ -221,9 +225,12 @@ void action_decl(node_t root)
 
 int32_t action_op(node_t root)
 {
-    printf("Je rentre dans action OP avec le noeud : %s\n", node_nature2string(root->nature));
-    printf("FILS 1 : %s\n", node_nature2string(root->opr[0]->nature));
-    //printf("FILS 2 : %s\n", node_nature2string(root->opr[1]->nature));
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans action_op\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     int32_t registre_courant_op1;
     int32_t registre_courant_op2;
     int32_t res_reg;
@@ -309,8 +316,8 @@ int32_t action_op(node_t root)
         }
     }
     
-    printf("NOEUD ACTUEL (action_op) : %s\n\n\n", node_nature2string(root->nature));
-    printf("Son operator flag vaut : %d\n\n\n", son_operator_flag);
+    //printf("NOEUD ACTUEL (action_op) : %s\n\n\n", node_nature2string(root->nature));
+    //printf("Son operator flag vaut : %d\n\n\n", son_operator_flag);
     if(son_operator_flag >= 0){
         if(son_operator_flag == 0){
             if(root->opr[1]->nature == NODE_IDENT)
@@ -333,14 +340,14 @@ int32_t action_op(node_t root)
     {
         if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
         {
-            printf("MES DEUX FILS SONT DES LITERRAUX \n\n");
+            //printf("MES DEUX FILS SONT DES LITERRAUX \n\n");
             create_ori_inst(8, 0, root->opr[0]->value);
             gen_ope_i_code(root, res_reg, 8, (int32_t)root->opr[1]->value);
 
         }
         else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
         {
-            printf("UN FILS LITTERAL ET UN IDENT\n");
+            //printf("UN FILS LITTERAL ET UN IDENT\n");
             load_ident(root->opr[1], 8);
             gen_ope_i_code(root, res_reg, 8, root->opr[0]->value);
         }
@@ -354,7 +361,7 @@ int32_t action_op(node_t root)
     {
         if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
         {
-            printf("UN FILS IDENT ET UN LITTERAL\n");
+            //printf("UN FILS IDENT ET UN LITTERAL\n");
 
             if(root->nature != NODE_AFFECT)
             {
@@ -368,7 +375,7 @@ int32_t action_op(node_t root)
         }
         else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
         {
-            printf("DEUX FILS IDENT\n");
+            //printf("DEUX FILS IDENT\n");
             load_ident(root->opr[0], 8);
             if (reg_available())
             {
@@ -399,8 +406,12 @@ int32_t action_op(node_t root)
 }
 
 void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_source2){
-    printf("JE RENTRE DANS GEN OPE R CODE \n");
-    printf("AVEC LE NOEUD ACTUEL : %s\n\n\n", node_nature2string(node->nature));
+    
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans gen_ope_r_code\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(node->nature));
+    }
 
     int32_t new_reg;
     int32_t new_label_nb;
@@ -536,8 +547,11 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
 
 void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
 {
-    printf("JE RENTRE DANS GEN_OPE_I_CODE\n");
-    printf("AVCE LE NOEUD ACTUEL : %s\n\n\n", node_nature2string(node->nature));
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans gen_ope_i_code\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(node->nature));
+    }
 
     int32_t new_reg;
     int32_t new_label_nb;
@@ -625,13 +639,17 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
 
 void load_ident(node_t root, int32_t dest)
 {
-    printf("JE RENTRE DANS LOAD_IDENT  !! \n\n\n"); 
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans load_ident\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     if(root->decl_node->global_decl){
             create_lui_inst(dest, data_start);
             create_lw_inst(dest, root->decl_node->offset, dest);
     }
     else {
-        printf("nature de root %s \n\n", node_nature2string(root->nature));
         if(root->nature == NODE_IDENT){
             create_lw_inst(dest, root->decl_node->offset, stack_reg);
         }
@@ -640,7 +658,12 @@ void load_ident(node_t root, int32_t dest)
 
 void store_ident(node_t root, int32_t source, bool is_decl)
 {
-    printf("JE RENTRE DANS STORE IDENT\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans store_ident\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     if (is_decl)
     {
         if(root->global_decl)
@@ -667,7 +690,12 @@ void store_ident(node_t root, int32_t source, bool is_decl)
 
 void action_loop(node_t root)
 {
-    printf("JE RENTRE DANS ACTION LOOP\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans action_loop\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     int32_t num_registre;
     int32_t true_register;
     int32_t label_loop = get_new_label();
@@ -770,8 +798,11 @@ void action_loop(node_t root)
 
 void action_print(node_t root)
 {   
-    //printf("JE RENTRE DANS ACTION PRINT\n");
-    //printf("AVCE LE NOEUD ACTUEL : %s\n\n\n", node_nature2string(root->nature));
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans action_print\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
 
     for (int i = 0; i < root->nops; ++i)
     {
@@ -779,7 +810,7 @@ void action_print(node_t root)
         {
             case NODE_STRINGVAL :
                 create_lui_inst(4, data_start);
-                printf("offset de la string : %d\n", root->opr[i]->offset);
+                //printf("offset de la string : %d\n", root->opr[i]->offset);
                 create_ori_inst(4, 4, root->opr[i]->offset);
                 create_ori_inst(2, 0, 4);
                 create_syscall_inst();
@@ -802,7 +833,12 @@ void action_print(node_t root)
 
 int32_t action_uminus(node_t root)
 {
-    printf("JE RENTRE DANS ACTION UMINUS\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans action_uminus\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     //ON ALLOUE UN REG
     int32_t res_reg;
 

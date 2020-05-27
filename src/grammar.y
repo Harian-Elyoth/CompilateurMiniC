@@ -20,7 +20,6 @@ extern bool stop_after_verif;
 extern char * infile;
 extern char * outfile;
 
-
 /* prototypes */
 int yylex(void);
 extern int yylineno;
@@ -465,13 +464,12 @@ ident:
 
 %%
 
-/* A completer et/ou remplacer avec d'autres fonctions */
 node_t make_node(node_nature nature, int nops, ...) {
 
     va_list ap;
     node_t res = malloc(sizeof(node_s));
     if(res == NULL){
-        printf("ERREUR D'ALLOCATION MEMOIRE DANS LE MAKENODE");
+        fprintf(stderr, "ALLOCATION MEMOIRE DANS LE MAKENODE");
         return 0;
     }
         
@@ -485,13 +483,13 @@ node_t make_node(node_nature nature, int nops, ...) {
     switch(nature){
         case NODE_TYPE :
             //printf("nops de TYPE = %d\n\n", nops);
-            //res->opr = malloc(sizeof(node_t)*(nops-1));
+
             res->type = va_arg(ap, node_type);
             break;
 
         case NODE_IDENT :
 
-            //res->opr = malloc(sizeof(node_t)*(nops-1));
+
             res->type = TYPE_NONE;
             char * monstr = va_arg(ap, char *);
             //printf("\n\nMon str vaut %s\n\n", monstr);
@@ -500,20 +498,20 @@ node_t make_node(node_nature nature, int nops, ...) {
             break;
         
         case NODE_INTVAL :
-            //res->opr = malloc(sizeof(node_t)*nops);
+
             res->type = TYPE_INT;
             res->value = yylval.intval;
             break;
         
         case NODE_STRINGVAL :
-            //res->opr = malloc(sizeof(node_t)*(nops-1));
+
             res->type = TYPE_STRING;
             res->str = malloc(sizeof(char)*(strlen(yylval.strval)));
             res->str = yylval.strval;
             break;
 
         case NODE_BOOLVAL :
-            //res->opr = malloc(sizeof(node_t)*(nops-1));
+
             res->type = TYPE_BOOL;
             if(va_arg(ap, char *) == "true")
                 res->value = 1;
@@ -522,7 +520,7 @@ node_t make_node(node_nature nature, int nops, ...) {
             break;
 
         default :
-            //res->opr = malloc(sizeof(node_t)*nops);
+
             res->type = TYPE_NONE;
             for(int i = 0 ; i < nops ; i++){
                 res->opr[i] = va_arg(ap, node_t);
@@ -547,7 +545,7 @@ void analyse_tree(node_t root)
             dump_mips_program(outfile);
             free_program();
         }
-        free_global_strings();
+        free_global_strings(); 
     }
 }
 

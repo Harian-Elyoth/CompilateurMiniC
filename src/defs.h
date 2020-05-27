@@ -79,6 +79,7 @@ typedef struct _node_s {
     int64_t value; //NODE_INTVAL | NODE_BOOLVAL
     int32_t offset; //Passe 1
     bool global_decl; //Passe 1
+    bool is_ini;
     int32_t lineno;
     int32_t stack_size; //Passe 1
 

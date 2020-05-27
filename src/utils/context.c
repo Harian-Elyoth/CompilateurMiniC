@@ -35,7 +35,6 @@ void * get_data(context_t context, char * idf)
 	void * data;
 
 	if(idf_in_context(context, idf) == false){
-		printf("%s n'existe pas dans ce context\n",idf);
 		return NULL;
 	}
 	else {
@@ -52,11 +51,6 @@ void * get_data(context_t context, char * idf)
 				
 				data = noeud_actuel->data;
 
-				if (data == NULL)
-				{
-					printf("DATA NON ALLOUE, FOR\n");
-					
-				}
 				return data;
 			}
 			else
@@ -65,10 +59,6 @@ void * get_data(context_t context, char * idf)
 			}
 		}
 		data = noeud_actuel->data;
-		if (data == NULL)
-				{
-					printf("DATA NON ALLOUE, END\n");
-				}
 		return data;
 	}
 }
@@ -80,7 +70,6 @@ void * get_node(context_t context, char *idf){
 	//printf("je rentre dans get_node\n");
 
 	if(idf_in_context(context, idf) == false){
-		printf("%s n'existe pas dans ce context\n",idf);
 		return NULL;
 	}
 	else {
@@ -96,12 +85,6 @@ void * get_node(context_t context, char *idf){
 			if(i == longueur_idf){
 				
 				node = noeud_actuel->node;
-
-				if (node == NULL)
-				{
-					printf(" NON ALLOUE, FOR\n");
-					
-				}
 				return node;
 			}
 			else
@@ -110,10 +93,6 @@ void * get_node(context_t context, char *idf){
 			}
 		}
 		node = noeud_actuel->node;
-		if (node == NULL)
-				{
-					printf("DATA NON ALLOUE, END\n");
-				}
 		return node;
 	}
 }
@@ -122,7 +101,7 @@ void * get_node(context_t context, char *idf){
 
 void free_context(context_t context)
 {
-	printf("On rentre dans free_context\n");
+	//printf("On rentre dans free_context\n");
 	noeud_t noeud_actuel = context->root;
 
 	free_noeud(noeud_actuel);
@@ -142,7 +121,7 @@ void free_noeud(noeud_t noeud)
 	{
 		//printf("on free la data : %d\n", *((int *)noeud->data));
 		//free((int *)noeud->data);
-		printf("le free data marche pas !\n");
+		//printf("le free data marche pas !\n");
 	}
 	for (int i = 0; i < NB_ELEM_ALPHABET; ++i)
 	{
@@ -181,7 +160,6 @@ bool idf_in_context(context_t context, char * idf){
 			}
 
 	}
-	printf("LE RETURN DE SECURITE\n\n\n");
 	return true;
 }
 
@@ -202,7 +180,7 @@ bool context_add_element(context_t context, node_t node, char * idf, void * data
 		for(int i = 0 ; i < longueur_idf; i++)
 		{
 
-			printf("char_actuel : %c\n",char_actuel[i]);
+			//printf("char_actuel : %c\n",char_actuel[i]);
 
 			noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] = malloc(sizeof(noeud_s));
 			noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];

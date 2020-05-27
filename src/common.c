@@ -61,11 +61,23 @@ void set_trace_level(int trace_level)
             break;
 
         case 3:
-            //??
+            ///Affiche les règles acceptées
+            yy_flex_debug = 1;
+    
+            //Affiche les reducing et shifting des règles
+            #if YYDEBUG
+            yydebug = 1;
+            #endif
             break;
 
         case 4:
-            //??
+            //Affiche les règles acceptées
+            yy_flex_debug = 1;
+    
+            //Affiche les reducing et shifting des règles
+            #if YYDEBUG
+            yydebug = 1;
+            #endif
             break;
 
         default:
@@ -82,7 +94,7 @@ int parse_args(int argc, char ** argv)
         printf("\n\nVoici ci-après les option possible pour le compilateur minicc :\n\n\n");
         printf("-b : Affiche une bannière indiquant le nom du compilateur et des membres du binôme\n\n");
         printf("-o <filename> : Définit le nom du fichier assembleur produit (défaut : out.s).\n\n");
-        printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 5 (0 = pas de trace ; 5 = toutes les traces ; defaut = 0).\n\n");
+        printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 4 (0 = pas de trace ; 4 = toutes les traces ; defaut = 0).\n\n");
         printf("-r <int> : Définit le nombre maximum de registres à utiliser, entre 4 et 8 (défaut : 8).\n\n");
         printf("-s : Arrêter la compilation après l’analyse syntaxique (défaut = non).\n\n");
         printf("-v : Arrêter la compilation après la passe de vérifications (défaut = non).\n\n");
@@ -129,7 +141,7 @@ int parse_args(int argc, char ** argv)
                 printf("\n\nVoici ci-après les option possible pour le compilateur minicc :\n\n\n");
                 printf("-b : Affiche une bannière indiquant le nom du compilateur et des membres du binôme\n\n");
                 printf("-o <filename> : Définit le nom du fichier assembleur produit (défaut : out.s).\n\n");
-                printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 5 (0 = pas de trace ; 5 = toutes les traces ; defaut = 0).\n\n");
+                printf("-t <int> : Définit le niveau de trace à utiliser entre 0 et 4 (0 = pas de trace ; 4 = toutes les traces ; defaut = 0).\n\n");
                 printf("-r <int> : Définit le nombre maximum de registres à utiliser, entre 4 et 8 (défaut : 8).\n\n");
                 printf("-s : Arrêter la compilation après l’analyse syntaxique (défaut = non).\n\n");
                 printf("-v : Arrêter la compilation après la passe de vérifications (défaut = non).\n\n");
@@ -283,7 +295,9 @@ static void dump_tree2dot(FILE * f, node_t root) {
 
 
 void dump_tree(node_t prog_root, const char * dotname) {
-    printf("\nDebut du Dump Tree\n");
+
+    if(trace_level>=3){printf("\nDebut du Dump Tree\n");}
+
     FILE * f;
     f = fopen(dotname, "w");
     if(f == NULL){
@@ -292,7 +306,9 @@ void dump_tree(node_t prog_root, const char * dotname) {
     fprintf(f, "digraph global_vars {\n");
     dump_tree2dot(f, prog_root);
     fprintf(f, "}");    
-    printf("Fin du Dump Tree\n");
+
+    if(trace_level>=3){printf("Fin du Dump Tree\n");}
+    
     fclose(f);
 }
 

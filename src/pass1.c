@@ -3,19 +3,22 @@
 extern bool print_warning;
 extern int32_t global_strings_number;
 extern char ** global_string;
+extern int trace_level;
 
-bool flag_global = true; //flag variable globales
-bool flag_decl = false;  // flag de declaration
-node_type type_actuel = TYPE_NONE; // flag type courant pour la variable déclarée
-bool error_in_program = false; // flag qui indique une erreur dans le prog
+bool flag_global = true;            //flag variable globales
+bool flag_decl = false;             // flag de declaration
+node_type type_actuel = TYPE_NONE;  // flag type courant pour la variable déclarée
+bool error_in_program = false;      // flag qui indique une erreur dans le prog
 int32_t stack_size_decl = 0;
 
 void passe_1(node_t root){
 
-    printf("je rentre dans pass1\n\n");
-    const char * nature = node_nature2string(root->nature); 
-    printf("node actuel : %s\n\n", nature);
-
+    if (trace_level >= 3)
+    {
+        printf("Je rentre dans passe 1\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+    
     //TRAITEMENT EFFECTUE EN DESCENDANT DANS L'ARBRE (DFS)
     char error_msg[100];
 
@@ -190,6 +193,13 @@ void passe_1(node_t root){
 
 void test_boucle(node_t root)
 {
+
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans test_boucle\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     char error_msg[100];
 
     switch(root->opr[0]->nature)
@@ -230,6 +240,12 @@ void test_boucle(node_t root)
 
 void actions_node_ident(node_t root)
 {
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans actions_node_ident\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     char error_msg[100];
     bool is_main = false;
     //printf("je suis dans NODE_IDENT\n");
@@ -255,7 +271,19 @@ void actions_node_ident(node_t root)
                 fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
                 exit(1);
             }
-            else{root->type = (root->decl_node)->type;}
+            else
+            {
+                root->type = (root->decl_node)->type;
+                if (root->is_ini)
+                {
+                    if (print_warning)
+                    {
+                        error_in_program = true;      
+                        sprintf(error_msg, "La variable %s n'a pas été initialisée !\n", root->ident);
+                        fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                    }
+                }
+            }
         }
         else
         {
@@ -273,6 +301,12 @@ void actions_node_ident(node_t root)
 
 void actions_node_decl(node_t root)
 {
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans actions_node_decl\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     char error_msg[100];
     flag_decl = true;
 
@@ -293,6 +327,12 @@ void actions_node_decl(node_t root)
 
 void test_op(node_t root)
 {
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans test_op\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     switch(root->nature)
     {
         case NODE_MUL :
@@ -337,7 +377,12 @@ void test_op(node_t root)
 
 void test_op_type(node_t root, int type)
 {
-    printf("JE RENTRE DANS test_op_type\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans test_op_type\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     int is_allocate = 0;
     int is_push = 0;
 
@@ -376,7 +421,7 @@ void test_op_type(node_t root, int type)
 
     for (int i = 0; i < root->nops; ++i)
     {
-        printf("tour de boucle : %d\n", i);
+        //printf("tour de boucle : %d\n", i);
         if (root->opr[i]->nature != NODE_INTVAL && root->opr[i]->nature != NODE_BOOLVAL)
         {
             passe_1(root->opr[i]);
@@ -432,6 +477,11 @@ void test_op_type(node_t root, int type)
 
 void test_op_cond(node_t root)
 {
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans test_op_cond\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
 
     int is_allocate = 0;
     int is_push = 0;
@@ -494,7 +544,12 @@ void test_op_cond(node_t root)
 
 void actions_uminus(node_t root)
 {
-    //printf("JE RENTRE DANS actions_uminus\n");
+    if (trace_level == 4)
+    {
+        printf("Je rentre dans actions_uminus\n");
+        printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
+    }
+
     switch(root->opr[0]->nature)
     {
         case NODE_MUL :
@@ -511,5 +566,4 @@ void actions_uminus(node_t root)
             passe_1(root->opr[0]);
             break;
     }
-    //printf("JE SORS DE actions_uminus\n");
 }
