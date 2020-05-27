@@ -8,6 +8,7 @@
 #include "common.h"
 #include "utils/registers.h"
 #include "utils/mips_inst.h"
+#include "utils/context.h"
 
 #include <string.h>
 #include <stdint.h>
@@ -29,5 +30,4 @@ void store_ident(node_t node, int32_t source, bool is_decl);
 void action_loop(node_t root);
 void action_print(node_t root);
 int32_t action_uminus(node_t root);
-int32_t action_plus_minus(node_t root);
 #endif

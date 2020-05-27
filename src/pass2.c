@@ -259,30 +259,6 @@ int32_t action_op(node_t root)
 
             case NODE_MINUS :
             case NODE_PLUS :
-                if (i == 0)
-                {
-                    son_operator_flag = i;
-                    registre_courant_op1 = action_plus_minus(root->opr[i]);
-                    if (reg_push_plus_minus)
-                    {
-                        pop_temporary(registre_courant_op1);
-                        reg_push_plus_minus = false;
-                    }
-                    else{release_reg();}
-                }
-                else
-                {
-                    son_operator_flag = i;
-                    registre_courant_op2 = action_plus_minus(root->opr[i]);
-                    if (reg_push_plus_minus)
-                    {
-                        pop_temporary(registre_courant_op2);
-                        reg_push_plus_minus = false;
-                    }
-                    else{release_reg();}
-                }
-                break;
-
             case NODE_MUL :
             case NODE_LT : 
             case NODE_LE : 
@@ -879,24 +855,3 @@ int32_t action_uminus(node_t root)
     return res_reg;
 }
 
-int32_t action_plus_minus(node_t root);
-{
-    printf("JE RENTRE DANS ACTION PLUS MINUS\n");
-    //ON ALLOUE UN REG
-    int32_t res_reg;
-
-    if (reg_available())
-    {
-        allocate_reg();
-        res_reg = get_current_reg();
-    }
-    else
-    {
-        reg_push_plus_minus = true;
-        push_temporary(get_current_reg());
-        allocate_reg();
-        res_reg = get_current_reg();
-    }
-
-
-}

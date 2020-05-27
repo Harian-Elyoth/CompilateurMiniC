@@ -36,9 +36,7 @@ extern int yydebug;
 
 
 LETTRE          [a-zA-Z]
-/* A completer ; fausses definitions pour que lex ne fasse pas d'erreur */
 SPECHAR         [ -/] 
-/*Possible source d'erreur*/
 CHIFFRE         [0-9]
 CHIFFRE_NON_NUL [1-9]
 ENTIER_DEC      (0|{CHIFFRE_NON_NUL}){CHIFFRE}*
