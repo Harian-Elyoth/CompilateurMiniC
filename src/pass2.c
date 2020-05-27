@@ -9,6 +9,8 @@ extern int32_t var_globales_offset;
 bool flag_data = true;
 bool reg_push_op = false;
 bool reg_push_loop = false;
+bool reg_push_uminus = false;
+bool reg_push_plus_minus = false;
 
 // le but de cette fonction est de générer un code assembleur sur le parcours de l'arbre.
 void passe_2(node_t root){
@@ -55,6 +57,11 @@ void passe_2(node_t root){
                 pop_temporary(num_registre);
                 reg_push_op = false;
             }
+            else if (reg_push_uminus)
+            {
+                pop_temporary(num_registre);
+                reg_push_uminus = false;
+            }
             else{release_reg();}
             break;
 
@@ -66,6 +73,10 @@ void passe_2(node_t root){
             break;
         case NODE_PRINT :
             action_print(node_actuel);
+
+        // case NODE_UMINUS :
+        //     num_registre = action_uminus(node_actuel);
+        //     break;
         default:
             break;
     }
@@ -115,7 +126,14 @@ void action_decl(node_t root)
     {
         if (root->opr[1] != NULL)
         {
-            create_word_inst(root->opr[0]->ident,(int32_t)(root->opr[1]->value));
+            if (root->opr[1]->nature == NODE_UMINUS)
+            {
+                create_word_inst(root->opr[0]->ident,(int32_t)((root->opr[1]->opr[0]->value)*-1));
+            }
+            else
+            {
+                create_word_inst(root->opr[0]->ident,(int32_t)(root->opr[1]->value));
+            }
         }
         else
         {
@@ -140,6 +158,25 @@ void action_decl(node_t root)
                     create_sw_inst(8, root->opr[0]->offset, 29);
                 }
                 break;
+            case NODE_UMINUS :
+
+                num_registre = action_uminus(root->opr[1]);
+                printf("num_registre = %d\n",num_registre);
+                store_ident(root->opr[0], num_registre, true);
+
+                if (reg_push_op)
+                {
+                    pop_temporary(num_registre);
+                    reg_push_op = false;
+                }
+                else if (reg_push_uminus)
+                {
+                    pop_temporary(num_registre);
+                    reg_push_uminus = false;
+                }
+                else{release_reg();}
+                break;
+
             case NODE_MUL :
             case NODE_MINUS :
             case NODE_LT : 
@@ -211,10 +248,42 @@ int32_t action_op(node_t root)
     2 : Sin fils operateur est le deuxieme fils (opr[1])
     */
 
+    if (root->opr[1]->nature == NODE_UMINUS)
+    {
+        res_reg = action_uminus(root->opr[1]);
+        return res_reg;
+    }
+
     for(int i = 0 ; i < root->nops ; i++){
         switch(root->opr[i]->nature){
-            case NODE_MUL :
+
             case NODE_MINUS :
+            case NODE_PLUS :
+                if (i == 0)
+                {
+                    son_operator_flag = i;
+                    registre_courant_op1 = action_plus_minus(root->opr[i]);
+                    if (reg_push_plus_minus)
+                    {
+                        pop_temporary(registre_courant_op1);
+                        reg_push_plus_minus = false;
+                    }
+                    else{release_reg();}
+                }
+                else
+                {
+                    son_operator_flag = i;
+                    registre_courant_op2 = action_plus_minus(root->opr[i]);
+                    if (reg_push_plus_minus)
+                    {
+                        pop_temporary(registre_courant_op2);
+                        reg_push_plus_minus = false;
+                    }
+                    else{release_reg();}
+                }
+                break;
+
+            case NODE_MUL :
             case NODE_LT : 
             case NODE_LE : 
             case NODE_GT : 
@@ -227,7 +296,6 @@ int32_t action_op(node_t root)
             case NODE_SLL :
             case NODE_SRL :
             case NODE_SRA :
-            case NODE_PLUS :
             case NODE_MOD :    
             case NODE_DIV :
             case NODE_AND : 
@@ -754,4 +822,81 @@ void action_print(node_t root)
                 break;
         }
     }
+}
+
+int32_t action_uminus(node_t root)
+{
+    printf("JE RENTRE DANS ACTION UMINUS\n");
+    //ON ALLOUE UN REG
+    int32_t res_reg;
+
+    if (reg_available())
+    {
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+    else
+    {
+        reg_push_uminus = true;
+        push_temporary(get_current_reg());
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+
+    //ON TRAITE TT LES CAS DES FILS DE UMINUS
+
+    switch(root->opr[0]->nature)
+    {
+        case NODE_IDENT :
+            load_ident(root->opr[0], res_reg);
+            create_subu_inst(res_reg, 0, res_reg);
+            break;
+
+        case NODE_INTVAL :
+            create_ori_inst(res_reg, 0, root->opr[0]->value);
+            create_subu_inst(res_reg, 0, res_reg);
+            break;
+
+        case NODE_PLUS :
+        case NODE_MINUS :
+        case NODE_BAND : 
+        case NODE_BOR : 
+        case NODE_BXOR :
+        case NODE_SLL :
+        case NODE_SRL :
+        case NODE_SRA :
+        case NODE_MUL :
+        case NODE_MOD :    
+        case NODE_DIV :
+            res_reg = action_op(root->opr[0]);
+            create_subu_inst(res_reg, 0, res_reg);
+            break;
+
+        default :
+            break;
+    }
+
+    return res_reg;
+}
+
+int32_t action_plus_minus(node_t root);
+{
+    printf("JE RENTRE DANS ACTION PLUS MINUS\n");
+    //ON ALLOUE UN REG
+    int32_t res_reg;
+
+    if (reg_available())
+    {
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+    else
+    {
+        reg_push_plus_minus = true;
+        push_temporary(get_current_reg());
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+
+
 }

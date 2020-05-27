@@ -189,11 +189,11 @@ int main(int argc, char ** argv)
 
     yyparse(&program_root);
 
-    dump_tree(program_root, "arbre_du_program.dot");
+    dump_tree(program_root, "apres_syntax.dot");
     fclose(yyin);
 
     analyse_tree(program_root);
-    dump_tree(program_root, "post_pass1.dot");
+    dump_tree(program_root, "apres_verif.dot");
     yylex_destroy();
     return 0;
 }

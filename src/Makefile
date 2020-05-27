@@ -51,8 +51,8 @@ clean:
 
 realclean: clean
 	rm -f y.tab.c y.tab.h lex.yy.c $(EXE)
-	rm arbre_du_program.dot
-	rm post_pass1.dot
-	rm output.s
+	rm apres_syntax.dot
+	rm apres_verif.dot
+	rm out.s
 
 
