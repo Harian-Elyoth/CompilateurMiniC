@@ -170,7 +170,6 @@ int parse_args(int argc, char ** argv)
     }
 
     infile = minic_file;
-    outfile = "out.s";
 
     return 0;
 }

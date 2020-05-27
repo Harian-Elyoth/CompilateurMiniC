@@ -7,5 +7,5 @@ void main()
 	{
 	 	val = end;
 	} 
-	print("la variable val vaut", val, "et doi valoir 12");
+	print("la variable val vaut ", val, " et doi valoir 12");
 }

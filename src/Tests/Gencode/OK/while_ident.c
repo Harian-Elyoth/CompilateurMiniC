@@ -11,5 +11,5 @@ void main()
 			b = false;
 		}
 	}
-	print("la variable b vaut ", b, "et doit valoir 0");
+	print("la variable b vaut ", b, " et doit valoir 0");
 }

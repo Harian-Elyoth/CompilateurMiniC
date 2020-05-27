@@ -6,5 +6,5 @@ void main()
 	int c = a/b;
 	int d = 32;
 	d = d/8;
-	print("les variables c et d valent respectivement", c, d, "et doivent valoir 2 et 4");
+	print("les variables c et d valent respectivement ", c, " et ", d, " et doivent valoir 2 et 4");
 }

@@ -7,5 +7,5 @@ void main()
 	{
 		sum = sum + 1;
 	}
-	print("la variable sum vaut", sum, "et doit valoir 0");
+	print("la variable sum vaut ", sum, " et doit valoir 0");
 }

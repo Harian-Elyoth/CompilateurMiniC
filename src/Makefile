@@ -48,11 +48,10 @@ pass2.o : pass2.c pass2.h defs.h $(UTILS)/mips_inst.h $(UTILS)/registers.h
 
 clean:
 	rm -f *.o
+	rm -f utils/*.o
 
 realclean: clean
-	rm -f y.tab.c y.tab.h lex.yy.c $(EXE)
-	rm apres_syntax.dot
-	rm apres_verif.dot
-	rm out.s
+	rm -f y.output y.tab.c y.tab.h lex.yy.c $(EXE)
+
 
 

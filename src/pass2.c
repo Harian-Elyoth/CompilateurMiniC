@@ -7,6 +7,7 @@ extern int32_t stack_size_decl;
 extern int32_t var_globales_offset;
 extern int nb_reg;
 extern int trace_level;
+extern node_t program_root;
 
 bool flag_data = true;
 bool reg_push_op = false;
@@ -164,8 +165,10 @@ void action_decl(node_t root)
                 }
                 break;
             case NODE_UMINUS :
+            case NODE_NOT :
+            case NODE_BNOT :
 
-                num_registre = action_uminus(root->opr[1]);
+                num_registre = action_op_unaire(root->opr[1]);
                 store_ident(root->opr[0], num_registre, true);
 
                 if (reg_push_op)
@@ -187,8 +190,6 @@ void action_decl(node_t root)
             case NODE_LE : 
             case NODE_GT : 
             case NODE_GE : 
-            case NODE_NOT :
-            case NODE_BNOT :
             case NODE_BAND : 
             case NODE_BOR : 
             case NODE_BXOR :
@@ -216,11 +217,6 @@ void action_decl(node_t root)
                 break;
         }   
     }
-    else
-    {
-        //var locale non initialisée
-        //marquer la var non initialisé encore         
-    }
 }
 
 int32_t action_op(node_t root)
@@ -235,18 +231,6 @@ int32_t action_op(node_t root)
     int32_t registre_courant_op2;
     int32_t res_reg;
 
-    if (reg_available())
-    {
-        allocate_reg();
-        res_reg = get_current_reg();
-    }
-    else
-    {
-        reg_push_op = true;
-        push_temporary(get_current_reg());
-        allocate_reg();
-        res_reg = get_current_reg();
-    }
 
     int son_operator_flag = -1; 
     /*
@@ -255,13 +239,8 @@ int32_t action_op(node_t root)
     2 : Sin fils operateur est le deuxieme fils (opr[1])
     */
 
-    if (root->opr[1]->nature == NODE_UMINUS)
-    {
-        res_reg = action_uminus(root->opr[1]);
-        return res_reg;
-    }
-
     for(int i = 0 ; i < root->nops ; i++){
+        
         switch(root->opr[i]->nature){
 
             case NODE_MINUS :
@@ -271,8 +250,6 @@ int32_t action_op(node_t root)
             case NODE_LE : 
             case NODE_GT : 
             case NODE_GE : 
-            case NODE_NOT :
-            case NODE_BNOT :
             case NODE_BAND : 
             case NODE_BOR : 
             case NODE_BXOR :
@@ -310,12 +287,48 @@ int32_t action_op(node_t root)
                 }
                 break;
 
+            // case NODE_IDENT :
+            //     if (i == 0)
+            //     {
+            //         load_ident(root->opr[i], 8);
+            //         registre_courant_op1 = 8;
+            //     }
+            //     else
+            //     {
+            //         load_ident(root->opr[i], 8);
+            //         registre_courant_op2 = 8;
+            //     }
+            //     break;
+
             default :
                 break;
                 
         }
     }
     
+    if (reg_available())
+    {
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+    else
+    {
+        reg_push_op = true;
+        push_temporary(get_current_reg());
+        allocate_reg();
+        res_reg = get_current_reg();
+    }
+
+    
+    //OP UNAIRE
+    if (root->opr[1]->nature == NODE_UMINUS || root->opr[1]->nature == NODE_BNOT || root->opr[1]->nature == NODE_NOT)
+    {   
+        res_reg = action_op_unaire(root->opr[1]);
+        return res_reg;
+    }
+        
+
+
     //printf("NOEUD ACTUEL (action_op) : %s\n\n\n", node_nature2string(root->nature));
     //printf("Son operator flag vaut : %d\n\n\n", son_operator_flag);
     if(son_operator_flag >= 0){
@@ -338,14 +351,14 @@ int32_t action_op(node_t root)
 
     else if (root->opr[0]->nature == NODE_INTVAL || root->opr[0]->nature == NODE_BOOLVAL)
     {
-        if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
+        if ((root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
         {
             //printf("MES DEUX FILS SONT DES LITERRAUX \n\n");
             create_ori_inst(8, 0, root->opr[0]->value);
             gen_ope_i_code(root, res_reg, 8, (int32_t)root->opr[1]->value);
 
         }
-        else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
+        else if (root->opr[1]->nature == NODE_IDENT)
         {
             //printf("UN FILS LITTERAL ET UN IDENT\n");
             load_ident(root->opr[1], 8);
@@ -359,7 +372,7 @@ int32_t action_op(node_t root)
     }
     else if (root->opr[0]->nature == NODE_IDENT)
     {
-        if (root->opr[1] != NULL && (root->opr[1]->nature == NODE_INTVAL || root->opr[1]->nature == NODE_BOOLVAL))
+        if ((root->opr[1]->nature == NODE_INTVAL) || (root->opr[1]->nature == NODE_BOOLVAL))
         {
             //printf("UN FILS IDENT ET UN LITTERAL\n");
 
@@ -370,10 +383,10 @@ int32_t action_op(node_t root)
             }
             else
             {
-                gen_ope_i_code(root, res_reg, -1, root->opr[1]->value);
+                gen_ope_i_code(root, res_reg, 8, root->opr[1]->value);
             }
         }
-        else if (root->opr[1] != NULL && root->opr[1]->nature == NODE_IDENT)
+        else if (root->opr[1]->nature == NODE_IDENT)
         {
             //printf("DEUX FILS IDENT\n");
             load_ident(root->opr[0], 8);
@@ -394,12 +407,6 @@ int32_t action_op(node_t root)
                 gen_ope_r_code(root, res_reg, 8, source2_reg);
                 pop_temporary(source2_reg);
             }
-        }
-        //op unaire
-        else
-        {
-            load_ident(root->opr[0], 8);
-            gen_ope_r_code(root,res_reg,8,0);
         }
     }
     return res_reg;
@@ -438,7 +445,6 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
                 break;
             case NODE_LE : 
                 create_sltu_inst(r_dest, r_source2, r_source);
-
                 new_label_nb = get_new_label();
                 new_label_nb_2 = get_new_label();
                 create_bne_inst(r_dest, 0, new_label_nb);
@@ -463,24 +469,16 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
 
             case NODE_GE : 
                 create_sltu_inst(r_dest, r_source, r_source2);
-
                 new_label_nb = get_new_label();
                 new_label_nb_2 = get_new_label();
-
                 create_bne_inst(r_dest, 0, new_label_nb);
                 create_ori_inst(r_dest, 0, 1);
                 create_j_inst(new_label_nb_2);
                 create_label_inst(new_label_nb);
-            
                 create_ori_inst(r_dest, 0, 0);
-
                 create_label_inst(new_label_nb_2);
                 break;
 
-            case NODE_NOT :
-            case NODE_BNOT :
-                create_nor_inst(r_dest, 0, r_source);
-                break;
             case NODE_BAND : 
                 create_and_inst(r_dest, r_source, r_source2);
                 break;
@@ -505,12 +503,12 @@ void gen_ope_r_code(node_t node, int32_t r_dest, int32_t r_source, int32_t r_sou
             case NODE_MOD :
                 create_teq_inst(r_source2, 0);    
                 create_div_inst(r_source, r_source2);
-                create_mflo_inst(r_dest);
+                create_mfhi_inst(r_dest);
                 break;
             case NODE_DIV :
                 create_teq_inst(r_source2, 0);
                 create_div_inst(r_source, r_source2);
-                create_mfhi_inst(r_dest);
+                create_mflo_inst(r_dest);
                 break;
             case NODE_AND : 
                 create_and_inst(r_dest, r_source, r_source2);
@@ -561,10 +559,10 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
 
         case NODE_LT : 
             create_sltiu_inst(dest, source, imm);
-
             new_label_nb = get_new_label();
             new_label_nb_2 = get_new_label();
             create_bne_inst(dest, 0, new_label_nb);
+            create_ori_inst(dest, 0, 0);
             create_j_inst(new_label_nb_2);
             create_label_inst(new_label_nb);
             create_ori_inst(dest, 0, 1);
@@ -576,6 +574,7 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
             new_label_nb = get_new_label();
             new_label_nb_2 = get_new_label();
             create_bne_inst(dest, 0, new_label_nb);
+            create_ori_inst(dest, 0, 1);
             create_j_inst(new_label_nb_2);
             create_label_inst(new_label_nb);
             create_ori_inst(dest, 0, 0);
@@ -599,8 +598,6 @@ void gen_ope_i_code(node_t node, int32_t dest, int32_t source, int32_t imm)
         case NODE_SLL :
         case NODE_SRL :
         case NODE_SRA :
-        case NODE_NOT :
-        case NODE_BNOT :
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_MOD :    
@@ -710,11 +707,17 @@ void action_loop(node_t root)
         switch(root->opr[i]->nature)
         {
             case NODE_AFFECT :
+
                 num_registre = action_op(root->opr[i]);
                 store_ident(root->opr[i]->opr[0], num_registre, false);
+                create_label_inst(label_loop);
                 break;
 
             case NODE_IDENT :
+                load_ident(root->opr[i], 8);
+                num_registre = 8;
+                break;
+
             case NODE_EQ :
             case NODE_NE :
             case NODE_LT :
@@ -723,74 +726,49 @@ void action_loop(node_t root)
             case NODE_GE :
             case NODE_AND :
             case NODE_OR :
+
                 num_registre = action_op(root->opr[i]);
                 break;
 
+            case NODE_BNOT :
+            case NODE_NOT :
+                num_registre = action_op_unaire(root->opr[i]);
+
             case NODE_BLOCK :
 
-                if (reg_available())
-                {
-                    allocate_reg();
-                    true_register = get_current_reg();
-                }
-                else
-                {
-                    reg_push_loop = true;
-                    push_temporary(get_current_reg());
-                    allocate_reg();
-                    true_register = get_current_reg();
-                }
                 if (root->nature == NODE_IF)
                 {
-                    create_ori_inst(true_register, 0, 1);
-                    create_beq_inst(num_registre, true_register, label_suite);
+                    create_bne_inst(num_registre, 0, label_suite);
                     passe_2(root->opr[i]);
                     create_label_inst(label_suite);
-
-                    if (reg_push_loop){pop_temporary(true_register);}
-                    else{release_reg();}
                 }
                 else if (root->nature == NODE_WHILE) 
                 {
-                    create_ori_inst(true_register, 0, 1);
                     create_label_inst(label_loop);
-                    create_beq_inst(num_registre, true_register, label_suite);
+                    create_beq_inst(num_registre, 0, label_suite);
                     passe_2(root->opr[i]);
                     create_j_inst(label_loop);
                     create_label_inst(label_suite);
-                    if (reg_push_loop){pop_temporary(true_register);}
-                    else{release_reg();}
 
                 }
                 else if (root->nature == NODE_FOR)
                 {
-                    create_ori_inst(true_register, 0, 1);
-                    create_label_inst(label_loop);
-                    create_beq_inst(num_registre, true_register, label_suite);
+                    
+                    create_beq_inst(num_registre, 0, label_suite);
                     passe_2(root->opr[i]);
                     num_registre = action_op(root->opr[2]);
+                    store_ident(root->opr[2]->opr[0], num_registre, false);
                     create_j_inst(label_loop);
                     create_label_inst(label_suite);
-                    if (reg_push_loop){pop_temporary(true_register);}
-                    else{release_reg();}
+
                 }
                 else if (root->nature == NODE_DOWHILE)
                 {
-
                     create_label_inst(label_loop);
                     passe_2(root->opr[i]);
-                    create_ori_inst(true_register, 0, 1);
                     num_registre = action_op(root->opr[1]);
-                    create_bne_inst(num_registre, true_register, label_loop);
-                    if (reg_push_loop){pop_temporary(true_register);}
-                    else{release_reg();}
+                    create_beq_inst(num_registre, 0, label_loop);
                 }
-                if (reg_push_op)
-                {
-                    pop_temporary(num_registre);
-                    reg_push_op = false;
-                }
-                else{release_reg();}
                 break;
         } 
     }
@@ -831,11 +809,11 @@ void action_print(node_t root)
     }
 }
 
-int32_t action_uminus(node_t root)
+int32_t action_op_unaire(node_t root)
 {
     if (trace_level == 4)
     {
-        printf("Je rentre dans action_uminus\n");
+        printf("Je rentre dans action_op_unaire\n");
         printf("avec un node de nature : %s\n\n", node_nature2string(root->nature));
     }
 
@@ -855,39 +833,58 @@ int32_t action_uminus(node_t root)
         res_reg = get_current_reg();
     }
 
-    //ON TRAITE TT LES CAS DES FILS DE UMINUS
-
-    switch(root->opr[0]->nature)
+    if (root->nature == NODE_BNOT || root->nature == NODE_NOT)
     {
-        case NODE_IDENT :
-            load_ident(root->opr[0], res_reg);
-            create_subu_inst(res_reg, 0, res_reg);
-            break;
+        switch(root->opr[0]->nature)
+        {
+            case NODE_BOOLVAL :
+                create_ori_inst(res_reg, 0, root->opr[0]->value);
+                create_nor_inst(res_reg, 0, res_reg);
+                break;
 
-        case NODE_INTVAL :
-            create_ori_inst(res_reg, 0, root->opr[0]->value);
-            create_subu_inst(res_reg, 0, res_reg);
-            break;
+            case NODE_IDENT :
+                load_ident(root->opr[0], res_reg);
+                create_nor_inst(res_reg, 0, res_reg);
+                break;
 
-        case NODE_PLUS :
-        case NODE_MINUS :
-        case NODE_BAND : 
-        case NODE_BOR : 
-        case NODE_BXOR :
-        case NODE_SLL :
-        case NODE_SRL :
-        case NODE_SRA :
-        case NODE_MUL :
-        case NODE_MOD :    
-        case NODE_DIV :
-            res_reg = action_op(root->opr[0]);
-            create_subu_inst(res_reg, 0, res_reg);
-            break;
-
-        default :
-            break;
+            default :
+                res_reg = action_op(root->opr[0]);
+                break;
+        }
     }
+    else if(root->nature == NODE_UMINUS)
+    {
+        switch(root->opr[0]->nature)
+        {
+            case NODE_IDENT :
+                load_ident(root->opr[0], res_reg);
+                create_subu_inst(res_reg, 0, res_reg);
+                break;
 
+            case NODE_INTVAL :
+                create_ori_inst(res_reg, 0, root->opr[0]->value);
+                create_subu_inst(res_reg, 0, res_reg);
+                break;
+
+            case NODE_PLUS :
+            case NODE_MINUS :
+            case NODE_BAND : 
+            case NODE_BOR : 
+            case NODE_BXOR :
+            case NODE_SLL :
+            case NODE_SRL :
+            case NODE_SRA :
+            case NODE_MUL :
+            case NODE_MOD :    
+            case NODE_DIV :
+                res_reg = action_op(root->opr[0]);
+                create_subu_inst(res_reg, 0, res_reg);
+                break;
+
+            default :
+                break;
+        }
+    }
     return res_reg;
 }
 

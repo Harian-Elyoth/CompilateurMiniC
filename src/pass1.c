@@ -4,6 +4,7 @@ extern bool print_warning;
 extern int32_t global_strings_number;
 extern char ** global_string;
 extern int trace_level;
+extern node_t program_root;
 
 bool flag_global = true;            //flag variable globales
 bool flag_decl = false;             // flag de declaration
@@ -36,7 +37,7 @@ void passe_1(node_t root){
             if (root->opr[0]->type == TYPE_VOID)
             {
                 sprintf(error_msg, "On ne peut pas déclarer de variable de type VOID !\n");
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
                 exit(1);
                 error_in_program = true;
             }
@@ -89,6 +90,8 @@ void passe_1(node_t root){
         case NODE_BAND : 
         case NODE_BOR : 
         case NODE_BXOR :
+        case NODE_BNOT :
+        case NODE_NOT :
         case NODE_SLL :
         case NODE_SRL :
         case NODE_SRA :
@@ -119,8 +122,10 @@ void passe_1(node_t root){
         case NODE_GT : 
         case NODE_GE : 
         case NODE_BAND : 
-        case NODE_BOR : 
         case NODE_BXOR :
+        case NODE_BNOT :
+        case NODE_NOT :
+        case NODE_BOR : 
         case NODE_PLUS :
         case NODE_MOD :    
         case NODE_DIV :
@@ -154,7 +159,7 @@ void passe_1(node_t root){
             if (root->opr[0]->type != TYPE_INT)
             {
                 sprintf(error_msg, "Un opérateur sur des INT est utilsé sur d'autre type !\n");
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
                 exit(1);
                 error_in_program = true;
             }
@@ -226,7 +231,7 @@ void test_boucle(node_t root)
             if (root->opr[0]->type != TYPE_BOOL)
             {
                 sprintf(error_msg, "L'expression conditionnel ne renvoie pas un booleen !\n");
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
                 exit(1);
                 error_in_program = true;
             }
@@ -268,7 +273,7 @@ void actions_node_ident(node_t root)
                 root->type = TYPE_NONE;  
                 error_in_program = true;      
                 sprintf(error_msg, "La variable %s n'a pas été déclarée précédemment !\n", root->ident);
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
                 exit(1);
             }
             else
@@ -280,7 +285,7 @@ void actions_node_ident(node_t root)
                     {
                         error_in_program = true;      
                         sprintf(error_msg, "La variable %s n'a pas été initialisée !\n", root->ident);
-                        fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                        fprintf(stderr, "Warning line %d: %s\n", program_root->lineno, error_msg);
                     }
                 }
             }
@@ -290,7 +295,7 @@ void actions_node_ident(node_t root)
             if(root->type != TYPE_VOID)
             {
                 sprintf(error_msg, "le main n'est pas de type void !\n");
-                fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
                 exit(1);
                 error_in_program = true;
             }
@@ -315,7 +320,7 @@ void actions_node_decl(node_t root)
 
     if(offset_decl < 0){
         sprintf(error_msg, "La variable %s est déjà déclarée\n", root->opr[0]->ident);
-        fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+        fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
         exit(1);
         error_in_program = true;
     }
@@ -369,6 +374,14 @@ void test_op(node_t root)
             test_op_cond(root);
         }
         break;
+
+        case NODE_BNOT :
+            test_op_type(root, 0);
+            break;
+
+        case NODE_NOT :
+            test_op_type(root, 1);
+            break;
 
         default:
             break;
@@ -428,12 +441,23 @@ void test_op_type(node_t root, int type)
         }
     }
 
-    if(((root->opr[0]->type) != type_op) || ((root->opr[1]->type) != type_op))
-    {
-        sprintf(error_msg, "Des opérations sur des %s uniquement se font sur d'autres type !\n", node_type2string(type_op));
-        fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
-        exit(1);
-        error_in_program = true;
+    if(root->nops==2){
+        if(((root->opr[0]->type) != type_op) || ((root->opr[1]->type) != type_op))
+        {
+            sprintf(error_msg, "Des opérations sur des %s uniquement se font sur d'autres type !\n", node_type2string(type_op));
+            fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
+            exit(1);
+            error_in_program = true;
+        }
+    }
+    else{
+        if ((root->opr[0]->type) != type_op)
+        {
+            sprintf(error_msg, "Des opérations sur des %s uniquement se font sur d'autres type !\n", node_type2string(type_op));
+            fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
+            exit(1);
+            error_in_program = true;
+        }
     }
 
 
@@ -444,7 +468,7 @@ void test_op_type(node_t root, int type)
             if (print_warning)
             {
                 sprintf(error_msg, "Division par 0 ou Modulo 0 !\n");
-                fprintf(stderr, "Warning line %d: %s\n", root->lineno, error_msg);
+                fprintf(stderr, "Warning line %d: %s\n", program_root->lineno, error_msg);
             }
             
             error_in_program = true;
@@ -516,7 +540,7 @@ void test_op_cond(node_t root)
 
     if((root->opr[0]->type != root->opr[1]->type)){
         sprintf(error_msg, "Des opérations se font entre un INT et un BOOL ! \n");
-        fprintf(stderr, "Error line %d: %s\n", root->lineno, error_msg);
+        fprintf(stderr, "Error line %d: %s\n", program_root->lineno, error_msg);
         exit(1);
         error_in_program = true;
     }

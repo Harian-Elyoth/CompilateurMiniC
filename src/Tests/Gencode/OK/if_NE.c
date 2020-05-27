@@ -6,5 +6,5 @@ void main()
 	{
 		a = 2;
 	}
-	print("la variable a vaut", a, "et doi valoir 1");
+	print("la variable a vaut ", a, " et doit valoir 1");
 }

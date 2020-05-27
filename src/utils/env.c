@@ -20,8 +20,6 @@ int32_t global_strings_number = 0;
 char ** global_string;
 
 
-/* Note : Une fois les fonctions completees, ne PAS supprimer les commentaires explicatifs !*/
-
 /*========================================================================================*/
 
 /*FONCTION A APPELER LORS DE LA PASSE 1*/
@@ -153,6 +151,7 @@ void * get_decl_node(char * ident)
 		}
 		i++;
 	}
+	printf("ON RENVOIE NULL ICI\n");
 	return NULL;
 }
 

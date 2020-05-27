@@ -5,7 +5,7 @@ void main()
 	int b = 10;
 	bool c = a < b;
 	int d = 3;
-	d = d < 8;
-	print("c = ", c, " d = ", d);
-	// c = 1 ; d = 1
+	bool e = d < 8;
+	print("c = ", c, " e = ", e);
+	// c = 1 ; e = 1
 }

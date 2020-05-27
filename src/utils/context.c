@@ -146,7 +146,9 @@ bool idf_in_context(context_t context, char * idf){
 
 	//printf("Je rentre dans IDF in context\n\n\n");
     for(int i = 0 ; i < longueur_idf ; i++){
-		
+
+			//printf("char actuel = %c\n",char_actuel[i]);
+
 			if(noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] == NULL){
 				//printf("IDF IN CONTEXT RETURN FALSE\n");
 				return false;
@@ -181,13 +183,20 @@ bool context_add_element(context_t context, node_t node, char * idf, void * data
 		{
 
 			//printf("char_actuel : %c\n",char_actuel[i]);
-
-			noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] = malloc(sizeof(noeud_s));
-			noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
-			for (int i = 0; i < NB_ELEM_ALPHABET; ++i)
+			if (noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] == NULL)
 			{
-				noeud_actuel->suite_idf[i] = NULL;
+				noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A] = malloc(sizeof(noeud_s));
+				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
+				for (int i = 0; i < NB_ELEM_ALPHABET; ++i)
+				{
+					noeud_actuel->suite_idf[i] = NULL;
+				}
 			}
+			else
+			{
+				noeud_actuel = noeud_actuel->suite_idf[char_actuel[i] - CODE_ASCII_A];
+			}
+			
 			noeud_actuel->lettre = char_actuel[i];
 
 			if(i == longueur_idf - 1){

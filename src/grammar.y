@@ -483,14 +483,14 @@ node_t make_node(node_nature nature, int nops, ...) {
     switch(nature){
         case NODE_TYPE :
             //printf("nops de TYPE = %d\n\n", nops);
-
+            res->nops = 0;
             res->type = va_arg(ap, node_type);
             break;
 
         case NODE_IDENT :
 
-
             res->type = TYPE_NONE;
+            res->nops = 0;
             char * monstr = va_arg(ap, char *);
             //printf("\n\nMon str vaut %s\n\n", monstr);
             res->ident = malloc(sizeof(char)*strlen(monstr));
@@ -498,20 +498,20 @@ node_t make_node(node_nature nature, int nops, ...) {
             break;
         
         case NODE_INTVAL :
-
+            res->nops = 0;
             res->type = TYPE_INT;
             res->value = yylval.intval;
             break;
         
         case NODE_STRINGVAL :
-
+            res->nops = 0;
             res->type = TYPE_STRING;
             res->str = malloc(sizeof(char)*(strlen(yylval.strval)));
             res->str = yylval.strval;
             break;
 
         case NODE_BOOLVAL :
-
+            res->nops = 0;
             res->type = TYPE_BOOL;
             if(va_arg(ap, char *) == "true")
                 res->value = 1;
@@ -537,6 +537,7 @@ void analyse_tree(node_t root)
     if (!stop_after_syntax) 
     {
         passe_1(root);
+        //dump_tree(root, "apres_verif.dot");
 
         if (!stop_after_verif) 
         {

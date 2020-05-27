@@ -5,5 +5,5 @@ void main()
 	do{
 		b = b + 1;
 	}while(c >= b);
-	print("la variable b vaut", b, "et doit valoir 11");
+	print("la variable b vaut ", b, " et doit valoir 11");
 }

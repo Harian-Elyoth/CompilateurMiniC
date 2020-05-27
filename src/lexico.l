@@ -18,7 +18,8 @@ void analyse_tree(node_t root);
 
 
 char * infile = NULL;
-char * outfile = NULL;
+char * outfile = "out.s";
+node_t program_root;
 bool stop_after_syntax = false;
 bool stop_after_verif = false;
 int trace_level = DEFAULT_TRACE_LEVEL;
@@ -179,7 +180,7 @@ int main(int argc, char ** argv)
 {
     srand(time(NULL));
 
-    node_t program_root;
+    
 
     if(parse_args(argc, argv) == -1){return 0;}
 
@@ -189,11 +190,10 @@ int main(int argc, char ** argv)
 
     yyparse(&program_root);
 
-    dump_tree(program_root, "apres_syntax.dot");
+    //dump_tree(program_root, "apres_syntax.dot");
     fclose(yyin);
 
     analyse_tree(program_root);
-    dump_tree(program_root, "apres_verif.dot");
 
     if(trace_level == 4){printf("\nGénération du Code Assembleur terminé avec succés !\n\n");}
 

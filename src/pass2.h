@@ -29,5 +29,5 @@ void load_ident(node_t node, int32_t dest);
 void store_ident(node_t node, int32_t source, bool is_decl);
 void action_loop(node_t root);
 void action_print(node_t root);
-int32_t action_uminus(node_t root);
+int32_t action_op_unaire(node_t root);
 #endif
