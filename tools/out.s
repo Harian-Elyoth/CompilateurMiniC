@@ -1,7 +1,7 @@
 
 .data
 
-a: .word 10
+a: .word 0
 b: .word 2
 .asciiz "la variable c vaut"
 .asciiz "et doit valoir .."
@@ -14,7 +14,7 @@ main:
     lw    $8, 0($8)
     lui   $9, 0x1001
     lw    $9, 4($9)
-    or    $8, $8, $9
+    srlv  $8, $8, $9
     sw    $8, 0($29)
     lui   $4, 0x1001
     ori   $4, $4, 0x8

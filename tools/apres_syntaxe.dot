@@ -9,7 +9,7 @@ digraph global_vars {
     N6 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: a|Offset: -1}}"];
     edge[tailclip=true];
     N5 -> N6
-    N7 [shape=record, label="{{NODE INTVAL|Type: TYPE INT}|{Value: 10}}"];
+    N7 [shape=record, label="{{NULL}}"];
     edge[tailclip=true];
     N5 -> N7
     edge[tailclip=true];
@@ -49,7 +49,7 @@ digraph global_vars {
     N20 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: c|Offset: -1}}"];
     edge[tailclip=true];
     N19 -> N20
-    N21 [shape=record, label="{{NODE BOR|Type: TYPE NONE|Nb. ops: 2}}"];
+    N21 [shape=record, label="{{NODE SRL|Type: TYPE NONE|Nb. ops: 2}}"];
     N22 [shape=record, label="{{NODE IDENT|Type: TYPE NONE}|{<decl>Decl      |Ident: a|Offset: -1}}"];
     edge[tailclip=true];
     N21 -> N22
